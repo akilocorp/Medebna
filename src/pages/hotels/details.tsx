@@ -219,9 +219,10 @@ function a11yProps(index: number) {
   };
 }
 
+
 export default function ChooseRoom() {
   const router = useRouter();
-  const { hotelId, hotelName } = router.query;
+  const { hotelName } = router.query;
 
   const rooms: Room[] = [
     { id: 1, name: 'Standard Room', description: 'A comfortable room with all basic amenities.', image: '/assets/room.png', price: 100 },
