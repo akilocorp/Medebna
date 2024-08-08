@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { IoChevronBack } from 'react-icons/io5';
-import SwipeableViews from 'react-swipeable-views';
 import { useTheme, Theme, Direction } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Tabs from '@mui/material/Tabs';
@@ -12,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { Button } from '@mui/material';
 import { FaCar, FaGasPump, FaCogs, FaUsers, FaRoad, FaClock, FaMoneyBillWave, FaMapMarkerAlt, FaInfoCircle, FaLock } from 'react-icons/fa';
+import { useSwipeable } from 'react-swipeable';
 
 interface Car {
   id: number;
@@ -105,16 +105,17 @@ export default function ChooseCar() {
     setValue(newValue);
   };
 
-  const handleChangeIndex = (index: number) => {
-    setValue(index);
-  };
+  const handlers = useSwipeable({
+    onSwipedLeft: () => setValue((prev) => Math.min(prev + 1, 2)),
+    onSwipedRight: () => setValue((prev) => Math.max(prev - 1, 0)),
+  });
 
   if (!isMounted) {
     return null;
   }
 
   return (
-    <div className="bg-[#1a1a1a] min-h-screen text-[#ffffff]">
+    <div className="bg-[#1a1a1a] min-h-screen text-[#ffffff]" {...handlers}>
       <Head>
         <title>Choose Car - {rentalName}</title>
       </Head>
@@ -144,11 +145,7 @@ export default function ChooseCar() {
           <Tab label="Rental Info" {...a11yProps(2)} />
         </Tabs>
       </AppBar>
-      <SwipeableViews
-        axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-        index={value}
-        onChangeIndex={handleChangeIndex}
-      >
+      <div>
         <TabPanel value={value} index={0} dir={theme.direction}>
           <div className="p-4">
             <Link href="/cars" legacyBehavior>
@@ -248,87 +245,87 @@ export default function ChooseCar() {
           </div>
         </TabPanel>
         <TabPanel value={value} index={2} dir={theme.direction}>
-  <Box
-    className="bg-[#3d3c3f] bg-opacity-90 p-6 rounded-lg shadow-lg"
-    display="flex"
-    flexDirection="column"
-    gap={4}
-    mx="auto"
-    maxWidth="800px"
-  >
-    <Typography variant="h4" gutterBottom color="#fccc52" align="center" fontWeight="bold">
-      Rental Information
-    </Typography>
-    <Box display="flex" flexDirection="column" gap={2}>
-      <Box>
-        <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
-          Rental Duration
-        </Typography>
-        <Typography color="white" fontSize="1.1rem">From 12:00</Typography>
-        <Typography color="white" fontSize="1rem">
-          Guests are required to show a photo identification and credit card upon check-in. You&apos;ll need to let the property know in advance what time you&apos;ll arrive.
-        </Typography>
-      </Box>
-      <Box>
-        <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
-          Check-out
-        </Typography>
-        <Typography color="white" fontSize="1.1rem">Until 12:00</Typography>
-      </Box>
-    </Box>
-    <Box>
-      <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
-        Cancellation/ prepayment
-      </Typography>
-      <Typography color="white" fontSize="1rem">
-        Cancellation and prepayment policies vary according to accommodation type. Please enter the dates of your stay and check the conditions of your required option.
-      </Typography>
-    </Box>
-    <Box>
-      <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
-        Children and beds
-      </Typography>
-      <Typography color="white" fontSize="1.1rem">Child policies</Typography>
-      <Typography color="white" fontSize="1rem">Children of any age are welcome.</Typography>
-      <Typography color="white" fontSize="1rem">
-        To see correct prices and occupancy information, please add the number of children in your group and their ages to your search.
-      </Typography>
-      <Box mt={2}>
-        <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
-          Cot and extra bed policies
-        </Typography>
-        <Typography color="white" fontSize="1rem">0 - 2 years: Cot upon request, US$20 per child, per night</Typography>
-        <Typography color="white" fontSize="1rem">3+ years: Extra bed upon request, US$25 per person, per night</Typography>
-        <Typography color="white" fontSize="1rem">
-          Prices for cots and extra beds are not included in the total price, and will have to be paid for separately during your stay.
-        </Typography>
-        <Typography color="white" fontSize="1rem">
-          The number of extra beds and cots allowed is dependent on the option you choose. Please check your selected option for more information.
-        </Typography>
-        <Typography color="white" fontSize="1rem">All cots and extra beds are subject to availability.</Typography>
-      </Box>
-    </Box>
-    <Box>
-      <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
-        No age restriction
-      </Typography>
-      <Typography color="white" fontSize="1.1rem">There is no age requirement for check-in</Typography>
-    </Box>
-    <Box>
-      <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
-        Pets
-      </Typography>
-      <Typography color="white" fontSize="1.1rem">Pets are not allowed.</Typography>
-    </Box>
-    <Box>
-      <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
-        Accepted payment methods
-      </Typography>
-      <Typography color="white" fontSize="1.1rem">Visa, Mastercard, Cash</Typography>
-    </Box>
-  </Box>
-</TabPanel>
-      </SwipeableViews>
+          <Box
+            className="bg-[#3d3c3f] bg-opacity-90 p-6 rounded-lg shadow-lg"
+            display="flex"
+            flexDirection="column"
+            gap={4}
+            mx="auto"
+            maxWidth="800px"
+          >
+            <Typography variant="h4" gutterBottom color="#fccc52" align="center" fontWeight="bold">
+              Rental Information
+            </Typography>
+            <Box display="flex" flexDirection="column" gap={2}>
+              <Box>
+                <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
+                  Rental Duration
+                </Typography>
+                <Typography color="white" fontSize="1.1rem">From 12:00</Typography>
+                <Typography color="white" fontSize="1rem">
+                  Guests are required to show a photo identification and credit card upon check-in. You&apos;ll need to let the property know in advance what time you&apos;ll arrive.
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
+                  Check-out
+                </Typography>
+                <Typography color="white" fontSize="1.1rem">Until 12:00</Typography>
+              </Box>
+            </Box>
+            <Box>
+              <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
+                Cancellation/ prepayment
+              </Typography>
+              <Typography color="white" fontSize="1rem">
+                Cancellation and prepayment policies vary according to accommodation type. Please enter the dates of your stay and check the conditions of your required option.
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
+                Children and beds
+              </Typography>
+              <Typography color="white" fontSize="1.1rem">Child policies</Typography>
+              <Typography color="white" fontSize="1rem">Children of any age are welcome.</Typography>
+              <Typography color="white" fontSize="1rem">
+                To see correct prices and occupancy information, please add the number of children in your group and their ages to your search.
+              </Typography>
+              <Box mt={2}>
+                <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
+                  Cot and extra bed policies
+                </Typography>
+                <Typography color="white" fontSize="1rem">0 - 2 years: Cot upon request, US$20 per child, per night</Typography>
+                <Typography color="white" fontSize="1rem">3+ years: Extra bed upon request, US$25 per person, per night</Typography>
+                <Typography color="white" fontSize="1rem">
+                  Prices for cots and extra beds are not included in the total price, and will have to be paid for separately during your stay.
+                </Typography>
+                <Typography color="white" fontSize="1rem">
+                  The number of extra beds and cots allowed is dependent on the option you choose. Please check your selected option for more information.
+                </Typography>
+                <Typography color="white" fontSize="1rem">All cots and extra beds are subject to availability.</Typography>
+              </Box>
+            </Box>
+            <Box>
+              <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
+                No age restriction
+              </Typography>
+              <Typography color="white" fontSize="1.1rem">There is no age requirement for check-in</Typography>
+            </Box>
+            <Box>
+              <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
+                Pets
+              </Typography>
+              <Typography color="white" fontSize="1.1rem">Pets are not allowed.</Typography>
+            </Box>
+            <Box>
+              <Typography variant="h6" color="#fccc52" gutterBottom fontWeight="bold">
+                Accepted payment methods
+              </Typography>
+              <Typography color="white" fontSize="1.1rem">Visa, Mastercard, Cash</Typography>
+            </Box>
+          </Box>
+        </TabPanel>
+      </div>
     </div>
   );
 }

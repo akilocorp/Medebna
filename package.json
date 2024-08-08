@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "preinstall": "npx npm@7 install --legacy-peer-deps",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -17,7 +16,7 @@
     "@mui/system": "^5.16.6",
     "@reduxjs/toolkit": "^2.2.7",
     "@types/redux-form": "^8.3.11",
-    "@use-it/event-listener": "^0.1.6",
+    "@use-it/event-listener": "^0.1.7",
     "framer-motion": "^11.3.21",
     "next": "^14.2.5",
     "next-themes": "^0.3.0",
@@ -26,8 +25,6 @@
     "react-icons": "^5.2.1",
     "react-redux": "^8.0.0",
     "react-swipeable": "^6.2.2",
-    "react-swipeable-views": "^0.14.0",
-    "react-event-listener": "^0.6.6",
     "react-toastify": "^10.0.5",
     "redux-form": "^8.3.10"
   },

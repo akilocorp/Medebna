@@ -1,17 +1,17 @@
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
 import { IoChevronBack } from 'react-icons/io5';
-import SwipeableViews from 'react-swipeable-views';
-import { useTheme, Theme, Direction } from '@mui/material/styles';
+import { FaCalendarAlt, FaMapMarkerAlt, FaClock, FaTicketAlt, FaInfoCircle, FaConciergeBell, FaUserFriends, FaHandHoldingHeart } from 'react-icons/fa';
+import { useTheme, Direction } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { Button } from '@mui/material';
-import { FaCalendarAlt, FaMapMarkerAlt, FaClock, FaTicketAlt, FaInfoCircle, FaConciergeBell, FaUserFriends, FaHandHoldingHeart } from 'react-icons/fa';
+import { useSwipeable } from 'react-swipeable';
 
 interface Event {
   id: number;
@@ -90,6 +90,11 @@ export default function ChooseEvent() {
   const theme = useTheme();
 
   const [selectedCategory, setSelectedCategory] = useState<keyof typeof eventCategories>("event_Details");
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
@@ -99,12 +104,17 @@ export default function ChooseEvent() {
     setValue(newValue);
   };
 
-  const handleChangeIndex = (index: number) => {
-    setValue(index);
-  };
+  const handlers = useSwipeable({
+    onSwipedLeft: () => setValue((prev) => Math.min(prev + 1, 2)),
+    onSwipedRight: () => setValue((prev) => Math.max(prev - 1, 0)),
+  });
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
-    <div className="bg-[#1a1a1a] min-h-screen text-[#ffffff]">
+    <div className="bg-[#1a1a1a] min-h-screen text-[#ffffff]" {...handlers}>
       <Head>
         <title>Choose Event - {eventName}</title>
       </Head>
@@ -134,11 +144,7 @@ export default function ChooseEvent() {
           <Tab label="House Rules" {...a11yProps(2)} />
         </Tabs>
       </AppBar>
-      <SwipeableViews
-        axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-        index={value}
-        onChangeIndex={handleChangeIndex}
-      >
+      <div>
         <TabPanel value={value} index={0} dir={theme.direction}>
           <div className="p-4">
             <Link href="/events" legacyBehavior>
@@ -210,11 +216,10 @@ export default function ChooseEvent() {
                     "&:hover": {
                       backgroundColor: "#fccc52",
                       color: "#323232",
-                     
                     }
                   }}
                 >
-                 {category.replace("_", " ")}
+                  {category.replace("_", " ")}
                 </Button>
               ))}
             </Box>
@@ -319,8 +324,7 @@ export default function ChooseEvent() {
     </Box>
   </Box>
 </TabPanel>
-
-      </SwipeableViews>
+      </div>
     </div>
   );
 }
