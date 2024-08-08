@@ -63,7 +63,7 @@ const Header = () => {
       )}
       <div className={`fixed top-16 right-4 bg-[#1a1a1a] p-6 rounded-lg shadow-lg z-30 w-80 transition-transform duration-300 ${isPopupOpen ? 'transform translate-x-0 opacity-100' : 'transform translate-x-full opacity-0'}`}>
         <button onClick={closePopup} className="absolute top-2 right-2 text-white">X</button>
-        <h2 className="text-2xl font-bold mb-4 text-[#fccc52]">Sign In</h2>
+        <h2 className="text-2xl font-bold text-center mb-4 text-[#fccc52]">Sign In</h2>
         <form className="space-y-4" onSubmit={handleSignIn}>
           <div>
             <label className="block text-[#fccc52] mb-2">Email</label>
@@ -84,7 +84,7 @@ const Header = () => {
             />
           </div>
           <div className="flex justify-center">
-            <button type="submit" className="bg-[#fccc52] text-[#323232] px-6 py-3 mt-6 rounded-full font-bold text-lg shadow-md">Sign In</button>
+            <button type="submit" className="bg-[#fccc52] text-[#323232] px-4 py-2 mt-6 rounded-full font-bold text-lg shadow-md">Sign In</button>
           </div>
         </form>
       </div>

@@ -257,7 +257,7 @@ export default function ChooseEvent() {
         </Typography>
         <Typography color="white" fontSize="1.1rem">From 12:00</Typography>
         <Typography color="white" fontSize="1rem">
-          Guests are required to show a photo identification and credit card upon check-in. You'll need to let the property know in advance what time you'll arrive.
+          Guests are required to show a photo identification and credit card upon check-in. You&apos;ll need to let the property know in advance what time you&apos;ll arrive.
         </Typography>
       </Box>
       <Box>
