@@ -18,6 +18,8 @@
     "@types/redux-form": "^8.3.11",
     "@use-it/event-listener": "^0.1.7",
     "framer-motion": "^11.3.21",
+    "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "next": "^14.2.5",
     "next-themes": "^0.3.0",
     "react": "^18.3.1",
@@ -29,6 +31,7 @@
     "redux-form": "^8.3.10"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

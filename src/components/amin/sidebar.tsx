@@ -41,9 +41,11 @@ const AdminSidebar = () => {
         
       </div>
       <div className="mt-2 w-full">
-          <button className="w-full hover:bg-[#fccc52] hover:text-white text-gray-300 px-4 py-2 rounded flex items-center ">
+        <Link href="/" legacyBehavior>
+          <a className="hover:text-[#fccc52] hover:text-white text-gray-300 px-4 py-2 rounded flex items-center ">
             <FiLogOut className="mr-2" /> Logout
-          </button>
+          </a>
+        </Link>
         </div>
     </div>
   );

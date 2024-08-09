@@ -44,9 +44,11 @@ const OperatorSidebar = () => {
         <p className="text-center text-gray-400 ">Hi, Operator</p>
       </div>
       <div className="mt-2 w-full">
-        <button className="w-full hover:bg-[#fccc52] hover:text-white text-gray-300 px-4 py-2 rounded flex items-center justify-center">
-          <FiLogOut className="mr-2" /> Logout
-        </button>
+      <Link href="/" legacyBehavior>
+          <a className="hover:text-[#fccc52] hover:text-white text-gray-300 px-4 py-2 rounded flex items-center ">
+            <FiLogOut className="mr-2" /> Logout
+          </a>
+        </Link>
       </div>
     </div>
   );

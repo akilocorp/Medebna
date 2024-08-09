@@ -62,23 +62,35 @@ export default function ChooseEventCompany() {
           </a>
         </Link>
       </div>
-      <div className="w-full max-w-8xl p-4 mx-auto">
-        <div className="relative flex justify-between py-4 px-10 bg-gradient-to-r from-[#1a1a1a] to-transparent">
-          <div className="flex flex-col w-3/4">
-            <h1 className="text-4xl font-bold mb-8">Choose Your Event Company</h1>
-            <div className="flex items-center mb-8">
-              <input type="text" placeholder="Search" className="flex w-1/2 px-4 py-2 rounded-lg bg-[#fccc52] bg-opacity-30 text-gray-500" />
-              <button className="ml-4 px-4 py-2 rounded-lg bg-[#323232] text-[#fccc52]">Search</button>
-            </div>
-            <p className="text-lg leading-relaxed">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam efficitur.</p>
-          </div>
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-cover bg-center rounded-lg"
-            style={{
-              backgroundImage: "linear-gradient(to bottom right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/assets/eventt.png')",
-            }}
-          />
-        </div>
+      
+        <div className="w-full max-w-7xl p-4 mx-auto">
+  <div className="relative flex flex-col lg:flex-row justify-between py-4 px-6 bg-gradient-to-r from-[#1a1a1a] to-transparent rounded-lg">
+    <div className="flex flex-col w-full lg:w-3/4">
+      <h1 className="text-3xl lg:text-4xl font-bold mb-4">Choose Your Event Company</h1>
+      <div className="flex flex-col sm:flex-row items-center mb-4">
+        <input
+          type="text"
+          placeholder="Search"
+          className="flex w-full sm:w-1/2 px-4 py-2 rounded-lg bg-[#fccc52] bg-opacity-30 text-gray-500 mb-2 sm:mb-0"
+        />
+        <button className="sm:ml-4 px-4 py-2 rounded-lg bg-[#323232] text-[#fccc52]">
+          Search
+        </button>
       </div>
+      <p className="text-lg leading-relaxed">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
+        efficitur.
+      </p>
+    </div>
+    <div
+      className="mt-4 lg:mt-0 lg:absolute lg:top-0 lg:right-0 lg:w-1/2 h-64 lg:h-full bg-cover bg-center rounded-lg"
+      style={{
+        backgroundImage: "linear-gradient(to bottom right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/assets/eventt.png')",
+      }}
+    />
+  </div>
+</div>
+     
       <main className="bg-[#3d3c3f] bg-opacity-100 p-8 flex flex-col">
         <div className="flex justify-center items-center p-8">
           <div className="w-full max-w-7xl">

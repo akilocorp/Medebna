@@ -1,30 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/amin/adminLayout';
 import { Field, reduxForm, InjectedFormProps } from 'redux-form';
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
 import { addOperator } from '@/stores/admin/ApiCallerAdmin';
+import jwt from "jsonwebtoken";
 
 interface FormValues {
-  companyName: string;
+  name: string;   // Updated from companyName to name
   email: string;
   phone: string;
-  role: string;
+  type: string;   // Updated from role to type
 }
 
 const validate = (values: FormValues) => {
   const errors: Partial<FormValues> = {};
-  if (!values.companyName) {
-    errors.companyName = 'Company name is required';
+  if (!values.name) {   // Updated from companyName to name
+    errors.name = 'Company name is required';
   }
   if (!values.email) {
     errors.email = 'Email is required';
   }
   if (!values.phone) {
     errors.phone = 'Phone number is required';
+  } else if (!/^(\+251|0)[1-9]\d{8}$/.test(values.phone)) {
+    errors.phone = 'Phone number is invalid. It should be in the format 0911818413 or +251913808013';
   }
-  if (!values.role) {
-    errors.role = 'Role is required';
+
+  if (!values.type) {   // Updated from role to type
+    errors.type = 'Role is required';
   }
   return errors;
 };
@@ -71,28 +75,31 @@ const renderSelectField = ({
 
 const AddOperatorForm: React.FC<InjectedFormProps<FormValues>> = ({ handleSubmit }) => {
   const router = useRouter();
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+    }
+  }, []);
 
   const onSubmit = async (values: FormValues) => {
     try {
       await addOperator(values);
-      toast.success("Operator added successfully");
-      router.push("/admin/view-operators");
+      toast.success('Operator added successfully');
+      router.push('/admin/view-operators');
     } catch (error) {
-      toast.error("Error adding operator");
+      toast.error('Error adding operator');
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl mx-auto mt-8 p-6 bg-[#1a1a1a] rounded-lg shadow-lg">
-      <Field
-        name="companyName"
-        component={renderField}
-        type="text"
-        label="Company Name"
-      />
+      <Field name="name" component={renderField} type="text" label="Company Name" />  {/* Updated */}
       <Field name="email" component={renderField} type="email" label="Email" />
       <Field name="phone" component={renderField} type="text" label="Phone Number" />
-      <Field name="role" component={renderSelectField} label="Role">
+      <Field name="type" component={renderSelectField} label="Role">  {/* Updated */}
         <option value="">Select Role</option>
         <option value="hotel">Hotel Booking</option>
         <option value="car">Car Rental</option>

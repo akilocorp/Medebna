@@ -27,10 +27,27 @@ const Header = () => {
 
     try {
       const formData: SignInFormData = { email, password };
-      const user = await signIn(formData);
+      const response = await signIn(formData);
+      const user = response.user;
+      const token = response.token;
+      const userType = response.type;
+      
+      localStorage.setItem('token', token);
+
       dispatch(setAuth(user));
       toast.success('Signed in successfully');
-      router.push('/dashboard'); // Redirect to the desired page
+
+      if (userType === 'admin') {
+        router.push('/admin/add-operator');
+      } else if (userType === 'car') {
+        router.push('/car/Add-Listing-Form');
+      } else if (userType === 'event') {
+        router.push('/event/Add-Listing-Form');
+      } else if (userType === 'hotel') {
+        router.push('/hotel/Add-Listing-Form');
+      } else {
+        router.push('/');
+      }
     } catch (error) {
       toast.error('Error signing in');
     }
@@ -40,20 +57,23 @@ const Header = () => {
     <header className="fixed w-full top-0 left-0 bg-[#3d3c3f] bg-opacity-90 text-white py-4 shadow-lg z-10">
       <div className="max-w-7xl mx-auto px-4">
         <nav className="flex justify-between items-center">
-          <div className="flex items-center justify-between">
-            <Image src="/assets/illustration.png" alt="Your Logo" height={45} width={45} className="mr-8" />
-            <Link href="#rentals" legacyBehavior>
-              <a className="text-white mx-4 hover:text-[#fccc52] transition duration-300 drop-shadow-md">Car Rental</a>
-            </Link>
-            <Link href="#events" legacyBehavior>
-              <a className="text-white mx-4 hover:text-[#fccc52] transition duration-300 drop-shadow-md">Events</a>
-            </Link>
-            <Link href="#hotels" legacyBehavior>
-              <a className="text-white mx-4 hover:text-[#fccc52] transition duration-300 drop-shadow-md">Hotels</a>
-            </Link>
+          <div className="flex items-center">
+            <Image src="/assets/illustration.png" alt="Your Logo" height={45} width={45} className="mr-4" />
+            <div className="hidden md:flex">
+              <Link href="#rentals" legacyBehavior>
+                <a className="text-white mx-2 hover:text-[#fccc52] transition duration-300">Car Rental</a>
+              </Link>
+              <Link href="#events" legacyBehavior>
+                <a className="text-white mx-2 hover:text-[#fccc52] transition duration-300">Events</a>
+              </Link>
+              <Link href="#hotels" legacyBehavior>
+                <a className="text-white mx-2 hover:text-[#fccc52] transition duration-300">Hotels</a>
+              </Link>
+            </div>
           </div>
-          <div>
-            <button onClick={togglePopup} className="text-white hover:text-[#fccc52] transition duration-300 drop-shadow-md">Sign In</button>
+          <div className="flex items-center">
+            <button onClick={togglePopup} className="text-white hover:text-[#fccc52] transition duration-300 md:hidden">Signin</button>
+            <button onClick={togglePopup} className="text-white hover:text-[#fccc52] transition duration-300 hidden md:block">Sign In</button>
           </div>
         </nav>
       </div>
