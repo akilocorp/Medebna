@@ -74,42 +74,44 @@ const EditOperatorModal: React.FC<EditOperatorModalProps> = ({ isOpen, onClose, 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 p-6 rounded-lg text-white w-96">
-        <h2 className="text-2xl font-bold mb-4">Edit Operator</h2>
+      <div className="bg-white p-6 rounded-lg text-black w-96 shadow-lg">
+        <h2 className="text-2xl font-bold drop-shadow-md mb-4 bg-gradient-to-r from-[#ff914d] to-[#fccc52] bg-clip-text text-transparent">
+          Edit Operator
+        </h2>
         <div className="mb-4">
-          <label className="block mb-1">Name</label>
+          <label className="block mb-1 text-[#ff914d] drop-shadow-md font-semibold">Name</label>
           <input
             type="text"
-            className="w-full p-2 rounded bg-gray-700 text-white"
+            className="w-full p-2 rounded-full bg-white text-[#6a6a6a] placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#ff914d] shadow-md"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
           {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
         </div>
         <div className="mb-4">
-          <label className="block mb-1">Email</label>
+          <label className="block mb-1 text-[#ff914d] drop-shadow-md font-semibold">Email</label>
           <input
             type="email"
-            className="w-full p-2 rounded bg-gray-700 text-white"
+            className="w-full p-2 rounded-full  bg-white text-[#6a6a6a] placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#ff914d] shadow-md"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
         </div>
         <div className="mb-4">
-          <label className="block mb-1">Phone</label>
+          <label className="block mb-1 text-[#ff914d] font-semibold drop-shadow-md">Phone</label>
           <input
             type="text"
-            className="w-full p-2 rounded bg-gray-700 text-white"
+            className="w-full p-2 rounded-full bg-white text-[#6a6a6a] placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#ff914d] shadow-md"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
           {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
         </div>
         <div className="mb-4">
-          <label className="block mb-1">Role</label>
+          <label className="block mb-1 text-[#ff914d] font-semibold drop-shadow-md">Role</label>
           <select
-            className="w-full p-2 rounded bg-gray-700 text-white"
+            className="w-full p-2 rounded-full bg-white text-[#6a6a6a] placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#ff914d] shadow-md"
             value={type}
             onChange={(e) => setType(e.target.value)}
           >
@@ -121,10 +123,10 @@ const EditOperatorModal: React.FC<EditOperatorModalProps> = ({ isOpen, onClose, 
           {errors.type && <p className="text-red-500 text-sm">{errors.type}</p>}
         </div>
         <div className="flex justify-end space-x-2">
-          <button onClick={onClose} className="px-4 py-2 bg-red-500 rounded">
+          <button onClick={onClose} className="px-4 py-2 bg-red-500 rounded-full text-white shadow-md hover:bg-red-600">
             Cancel
           </button>
-          <button onClick={handleSave} className="px-4 py-2 bg-green-500 rounded">
+          <button onClick={handleSave} className="px-4 py-2 bg-[#ff914d] rounded-full text-white shadow-md hover:bg-[#fccc52]">
             Save
           </button>
         </div>

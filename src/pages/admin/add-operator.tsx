@@ -40,12 +40,12 @@ const renderField = ({
   meta: { touched, error },
 }: any) => (
   <div className="mb-6">
-    <label className="block text-[#fccc52] mb-2 text-lg font-bold">{label}</label>
+    <label className="block text-[#ff914d] mb-2 text-lg font-bold">{label}</label>
     <div className="relative">
       <input
         {...input}
         type={type}
-        className="w-full p-3 rounded-full bg-[#323232] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] focus:border-transparent shadow-md"
+        className="w-full p-3 rounded-full bg-white text-[#6a6a6a] placeholder-[#6a6a6a] focus:outline-none focus:ring-2 focus:ring-[#ff914d] focus:border-transparent shadow-md"
         placeholder={label}
       />
       {touched && error && <span className="text-red-500 text-sm mt-1 block">{error}</span>}
@@ -60,11 +60,11 @@ const renderSelectField = ({
   children,
 }: any) => (
   <div className="mb-6">
-    <label className="block text-[#fccc52] mb-2 text-lg font-bold">{label}</label>
+    <label className="block text-[#ff914d] mb-2 text-lg font-bold">{label}</label>
     <div className="relative">
       <select
         {...input}
-        className="w-full p-3 rounded-full bg-[#323232] text-white focus:outline-none focus:ring-2 focus:ring-[#fccc52] focus:border-transparent shadow-md"
+        className="w-full p-3 rounded-full bg-white text-[#6a6a6a] focus:outline-none focus:ring-2 focus:ring-[#ff914d] focus:border-transparent shadow-md"
       >
         {children}
       </select>
@@ -86,7 +86,16 @@ const AddOperatorForm: React.FC<InjectedFormProps<FormValues>> = ({ handleSubmit
 
   const onSubmit = async (values: FormValues) => {
     try {
-      await addOperator(values);
+      // Convert the email to lowercase
+      const formattedValues = {
+        ...values,
+        email: values.email.toLowerCase(), // Convert email to lowercase
+      };
+  
+      // Log the formatted values being sent to the backend
+      console.log("Form data being sent to backend:", formattedValues);
+  
+      await addOperator(formattedValues);
       toast.success('Operator added successfully');
       router.push('/admin/view-operators');
     } catch (error) {
@@ -95,7 +104,7 @@ const AddOperatorForm: React.FC<InjectedFormProps<FormValues>> = ({ handleSubmit
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl mx-auto mt-8 p-6 bg-[#1a1a1a] rounded-lg shadow-lg">
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl mx-auto mt-8 p-6 bg-[#ffffff] rounded-lg shadow-lg">
       <Field name="name" component={renderField} type="text" label="Company Name" />  {/* Updated */}
       <Field name="email" component={renderField} type="email" label="Email" />
       <Field name="phone" component={renderField} type="text" label="Phone Number" />
@@ -106,7 +115,7 @@ const AddOperatorForm: React.FC<InjectedFormProps<FormValues>> = ({ handleSubmit
         <option value="event">Event Booking</option>
       </Field>
       <div className="flex justify-center">
-        <button type="submit" className="bg-[#fccc52] text-[#323232] px-6 py-3 mt-6 rounded-full font-bold text-lg shadow-md">Add Operator</button>
+        <button type="submit" className="bg-gradient-to-r from-[#fccc52] to-[#ff914d] text-white  px-6 py-3 mt-6 rounded-full font-bold text-lg shadow-md hover:bg-[#fccc52] transition duration-300">Add Operator</button>
       </div>
     </form>
   );
@@ -119,7 +128,10 @@ const ConnectedAddOperatorForm = reduxForm<FormValues>({
 
 const AddOperatorPage = () => (
   <AdminLayout>
-    <h1 className="text-3xl text-center font-bold mb-8 text-[#fccc52]">Add Operator</h1>
+   <h1 className="text-3xl text-center drop-shadow-md font-bold mb-8 bg-gradient-to-r from-[#ff914d] to-[#fccc52] bg-clip-text text-transparent">
+  Add Operator
+</h1>
+
     <ConnectedAddOperatorForm />
   </AdminLayout>
 );

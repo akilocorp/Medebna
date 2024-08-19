@@ -1,3 +1,4 @@
+import CartIcon from '@/components/carticon';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -62,7 +63,10 @@ export default function ChooseEventCompany() {
           </a>
         </Link>
       </div>
-      
+      {/* Cart Icon positioned at the top right */}
+      <div className="absolute top-4 right-4">
+        <CartIcon />
+      </div>
         <div className="w-full max-w-7xl p-4 mx-auto">
   <div className="relative flex flex-col lg:flex-row justify-between py-4 px-6 bg-gradient-to-r from-[#1a1a1a] to-transparent rounded-lg">
     <div className="flex flex-col w-full lg:w-3/4">

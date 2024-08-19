@@ -13,6 +13,12 @@ export interface Operator {
   phone: string;
   type: string;  // updated from role to type
 }
+interface Operators {
+  _id: string;
+  name: string;
+  type: string;
+ 
+}
 
 const getToken = () => {
   if (typeof window !== "undefined") {
@@ -29,7 +35,7 @@ export const addOperator = async (formData: RegisterFormData) => {
   console.log("Token being used:", token); // Debugging line to check token
 
   try {
-    const response = await fetch("http://localhost:8000/operator/add-operator", {
+    const response = await fetch("http://194.5.159.228:5003/operator/add-operator", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -52,12 +58,44 @@ export const addOperator = async (formData: RegisterFormData) => {
   }
 };
 
+export const getHotels = async (): Promise<Operators[]> => {
+  try {
+    const response = await fetch("http://194.5.159.228:5003/operator/get-all-operators", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      console.error("Error fetching operators:", errorMessage);
+      return [];
+    }
+
+    const data = await response.json();
+    console.log("API response:", data); // Check the entire API response
+
+    if (!data || !data.operators) {
+      console.error("No operators data found");
+      return [];
+    }
+
+    return data.operators; // Assuming data.operators is the correct path
+  } catch (error) {
+    console.error("Error in getHotels:", error);
+    return [];
+  }
+};
+
+
 
 export const getOperators = async (): Promise<Operator[]> => {
   const token = getToken();
 
   try {
-    const response = await fetch("http://localhost:8000/operator/get-all-operators", {
+    const response = await fetch("http://194.5.159.228:5003/operator/get-all-operators", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -100,7 +138,7 @@ export const updateOperator = async (operator: Operator) => {
   }
 
   try {
-    const response = await fetch(`http://localhost:8000/operator/update-operator/${id}`, {
+    const response = await fetch(`http://194.5.159.228:5003/operator/update-operator/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -135,7 +173,7 @@ export const updateOperator = async (operator: Operator) => {
 export const deleteOperator = async (id: string) => {
   const token = getToken();
   try {
-    const response = await fetch(`http://localhost:8000/operator/delete-operator/${id}`, {
+    const response = await fetch(`http://194.5.159.228:5003/operator/delete-operator/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

@@ -12,6 +12,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { Button } from '@mui/material';
 import { useSwipeable } from 'react-swipeable';
+import CartIcon from '@/components/carticon';
 
 interface Event {
   id: number;
@@ -84,7 +85,8 @@ export default function ChooseEvent() {
     { id: 2, name: 'Art Exhibition', description: 'Explore contemporary art.', image: '/assets/event3.png', date: '2024-12-26', time: '14:00', location: 'Art Gallery', price: 20 },
     { id: 3, name: 'Tech Conference', description: 'Discover the latest in technology.', image: '/assets/event3.png', date: '2024-12-27', time: '09:00', location: 'Convention Center', price: 100 },
   ];
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [ticketCount, setTicketCount] = useState(1);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [value, setValue] = useState(0);
   const theme = useTheme();
@@ -98,8 +100,21 @@ export default function ChooseEvent() {
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
+    setIsModalOpen(true);
   };
+  
 
+  const handleAddToCart = () => {
+    if (ticketCount < 1) {
+      alert("Please enter a valid number of tickets.");
+      return;
+    }
+  
+    // If validation passes, add to cart logic here
+    console.log('Added to cart.', selectedEvent);
+    setIsModalOpen(false);
+  };
+  
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
   };
@@ -119,7 +134,8 @@ export default function ChooseEvent() {
         <title>Choose Event - {eventName}</title>
       </Head>
       <AppBar position="static" style={{ backgroundColor: '#3d3c3f', opacity: 0.9 }}>
-        <Tabs
+  <div className="relative flex justify-between items-center px-4">
+  <Tabs
           value={value}
           onChange={handleChange}
           textColor="inherit"
@@ -143,7 +159,12 @@ export default function ChooseEvent() {
           <Tab label="Event Details" {...a11yProps(1)} />
           <Tab label="House Rules" {...a11yProps(2)} />
         </Tabs>
-      </AppBar>
+    <div className="absolute top-3 right-4">
+      <CartIcon />
+    </div>
+  </div>
+</AppBar>
+
       <div>
         <TabPanel value={value} index={0} dir={theme.direction}>
           <div className="p-4">
@@ -165,38 +186,66 @@ export default function ChooseEvent() {
             </div>
           </div>
           <main className="bg-[#3d3c3f] bg-opacity-90 p-8 flex flex-col items-center">
-            <div className="w-full max-w-7xl">
-              <div className="flex flex-wrap justify-between gap-8">
-                {events.map((event) => (
-                  <div
-                    key={event.id}
-                    className={`w-full sm:w-[48%] lg:w-[30%] bg-[#323232] text-white rounded-xl shadow-lg cursor-pointer transform transition-transform duration-300 hover:scale-105 ${selectedEvent === event ? 'border-4 border-[#fccc52]' : ''}`}
-                    onClick={() => handleEventClick(event)}
-                  >
-                    <img src={event.image} alt={event.name} className="rounded-lg mb-4" />
-                    <div className="px-4 flex justify-between w-full items-center">
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-200 text-left">{event.name}</h3>
-                        <p className="text-left mb-2 text-sm text-gray-300">{event.description}</p>
-                        <p className="text-left mb-2 text-sm text-gray-300">${event.price} per ticket</p>
-                      </div>
-                      <div className="text-2xl text-[#fccc52] mb-2">
-                        <FaTicketAlt />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {selectedEvent && (
-                <div className="mt-8 text-center">
-                  <h2 className="text-3xl font-bold mb-4 text-[#fccc52]">{selectedEvent.name}</h2>
-                  <p className="mb-4">{selectedEvent.description}</p>
-                  <p className="mb-4">${selectedEvent.price} per ticket</p>
-                  <button className="bg-[#fccc52] text-[#323232] px-6 py-2 mt-4 rounded-lg">Book Now</button>
+      <div className="w-full max-w-7xl">
+        <div className="flex flex-wrap justify-between gap-8">
+          {events.map((event) => (
+            <div
+              key={event.id}
+              className={`w-full sm:w-[48%] lg:w-[30%] bg-[#323232] text-white rounded-xl shadow-lg cursor-pointer transform transition-transform duration-300 hover:scale-105 ${
+                selectedEvent === event ? 'border-4 border-[#fccc52]' : ''
+              }`}
+              onClick={() => handleEventClick(event)}
+            >
+              <img src={event.image} alt={event.name} className="rounded-lg mb-4" />
+              <div className="px-4 flex justify-between w-full items-center">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-200 text-left">{event.name}</h3>
+                  <p className="text-left mb-2 text-sm text-gray-300">{event.description}</p>
+                  <p className="text-left mb-2 text-sm text-gray-300">${event.price} per ticket</p>
                 </div>
-              )}
+                <div className="text-2xl text-[#fccc52] mb-2">
+                  <FaTicketAlt />
+                </div>
+              </div>
             </div>
-          </main>
+          ))}
+        </div>
+
+        {/* Modal */}
+        {isModalOpen && selectedEvent && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+            <div className="bg-[#1a1a1a] p-8 rounded-lg max-w-md w-full">
+              <h2 className="text-2xl font-bold text-[#fccc52] mb-4">{selectedEvent.name}</h2>
+              <p className="mb-2">{selectedEvent.description}</p>
+              <p className="mb-2">Price: ${selectedEvent.price} per ticket</p>
+              <label className="block mb-4 text-[#fccc52]">
+                Number of tickets:
+                <input
+                  type="number"
+                  min="1"
+                  value={ticketCount}
+                  onChange={(e) => setTicketCount(Number(e.target.value))}
+                  className="ml-2 p-2 border text-white rounded"
+                  required
+                />
+              </label>
+              <button
+                className="bg-[#fccc52] text-[#323232] px-6 py-2 mt-4 rounded-lg"
+                onClick={handleAddToCart}
+              >
+                Add to Cart
+              </button>
+              <button
+              className="ml-4 text-red-500"
+              onClick={() => setIsModalOpen(false)}
+            >
+              Cancel
+            </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </main>
         </TabPanel>
         <TabPanel value={value} index={1} dir={theme.direction}>
           <div className=" bg-[#3d3c3f] p-4">

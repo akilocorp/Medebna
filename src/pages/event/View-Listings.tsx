@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import OperatorLayout from '@/components/operator/operatorLayout';
-import { getListings, deleteListing } from '@/stores/operator/ApiCallerOperator'; // Update with the correct path
+import { getListings, deleteListing } from '@/stores/operator/ApiCallerOperatorHotel'; // Update with the correct path
 import { showToast } from '@/components/popup';
 import { FaTrash, FaEdit } from 'react-icons/fa';
 import Link from 'next/link';

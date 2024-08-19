@@ -12,6 +12,7 @@ import Box from '@mui/material/Box';
 import { Button } from '@mui/material';
 import { FaCar, FaGasPump, FaCogs, FaUsers, FaRoad, FaClock, FaMoneyBillWave, FaMapMarkerAlt, FaInfoCircle, FaLock } from 'react-icons/fa';
 import { useSwipeable } from 'react-swipeable';
+import CartIcon from '@/components/carticon';
 
 interface Car {
   id: number;
@@ -86,7 +87,9 @@ export default function ChooseCar() {
     { id: 2, name: 'SUV', description: 'A spacious SUV ideal for family trips.', image: '/assets/car.png', price: 80, fuel: 'Diesel', transmission: 'Manual', seats: 7, mileage: '20 mpg' },
     { id: 3, name: 'Luxury Sedan', description: 'A luxury sedan with all the latest features.', image: '/assets/car.png', price: 120, fuel: 'Hybrid', transmission: 'Automatic', seats: 5, mileage: '30 mpg' },
   ];
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [value, setValue] = useState(0);
   const theme = useTheme();
@@ -99,7 +102,24 @@ export default function ChooseCar() {
 
   const handleCarClick = (car: Car) => {
     setSelectedCar(car);
+    setIsModalOpen(true); 
   };
+  const handleAddToCart = () => {
+    if (!startDate || !endDate) {
+      alert("Please select both the start and end dates.");
+      return;
+    }
+  
+    if (new Date(endDate) <= new Date(startDate)) {
+      alert("End date must be after the start date.");
+      return;
+    }
+  
+    // Add to cart logic here
+    console.log('Added to cart.', selectedCar);
+    setIsModalOpen(false); // Close modal after adding to cart
+  };
+  
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
@@ -120,7 +140,8 @@ export default function ChooseCar() {
         <title>Choose Car - {rentalName}</title>
       </Head>
       <AppBar position="static" style={{ backgroundColor: '#3d3c3f', opacity: 0.9 }}>
-        <Tabs
+  <div className="relative flex justify-between items-center px-4">
+  <Tabs
           value={value}
           onChange={handleChange}
           textColor="inherit"
@@ -144,7 +165,12 @@ export default function ChooseCar() {
           <Tab label="Car Details" {...a11yProps(1)} />
           <Tab label="Rental Info" {...a11yProps(2)} />
         </Tabs>
-      </AppBar>
+    <div className="absolute top-3 right-4">
+      <CartIcon />
+    </div>
+  </div>
+</AppBar>
+      
       <div>
         <TabPanel value={value} index={0} dir={theme.direction}>
           <div className="p-4">
@@ -166,38 +192,78 @@ export default function ChooseCar() {
             </div>
           </div>
           <main className="bg-[#3d3c3f] bg-opacity-90 p-8 flex flex-col items-center">
-            <div className="w-full max-w-7xl">
-              <div className="flex flex-wrap justify-between gap-8">
-                {cars.map((car) => (
-                  <div
-                    key={car.id}
-                    className={`w-full sm:w-[48%] lg:w-[30%] bg-[#323232] text-white rounded-xl shadow-lg cursor-pointer transform transition-transform duration-300 hover:scale-105 ${selectedCar === car ? 'border-4 border-[#fccc52]' : ''}`}
-                    onClick={() => handleCarClick(car)}
-                  >
-                    <img src={car.image} alt={car.name} className="rounded-lg mb-4" />
-                    <div className="px-4 flex justify-between w-full items-center">
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-200 text-left">{car.name}</h3>
-                        <p className="text-left mb-2 text-sm text-gray-300">{car.description}</p>
-                        <p className="text-left mb-2 text-sm text-gray-300">${car.price} per day</p>
-                      </div>
-                      <div className="text-2xl text-[#fccc52] mb-2">
-                        <FaCar />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {selectedCar && (
-                <div className="mt-8 text-center">
-                  <h2 className="text-3xl font-bold mb-4 text-[#fccc52]">{selectedCar.name}</h2>
-                  <p className="mb-4">{selectedCar.description}</p>
-                  <p className="mb-4">${selectedCar.price} per day</p>
-                  <button className="bg-[#fccc52] text-[#323232] px-6 py-2 mt-4 rounded-lg">Book Now</button>
+      <div className="w-full max-w-7xl">
+        <div className="flex flex-wrap justify-between gap-8">
+          {cars.map((car) => (
+            <div
+              key={car.id}
+              className={`w-full sm:w-[48%] lg:w-[30%] bg-[#323232] text-white rounded-xl shadow-lg cursor-pointer transform transition-transform duration-300 hover:scale-105 ${
+                selectedCar === car ? 'border-4 border-[#fccc52]' : ''
+              }`}
+              onClick={() => handleCarClick(car)}
+            >
+              <img src={car.image} alt={car.name} className="rounded-lg mb-4" />
+              <div className="px-4 flex justify-between w-full items-center">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-200 text-left">{car.name}</h3>
+                  <p className="text-left mb-2 text-sm text-gray-300">{car.description}</p>
+                  <p className="text-left mb-2 text-sm text-gray-300">${car.price} per day</p>
                 </div>
-              )}
+                <div className="text-2xl text-[#fccc52] mb-2">
+                  <FaCar />
+                </div>
+              </div>
             </div>
-          </main>
+          ))}
+        </div>
+
+        {/* Modal */}
+        {isModalOpen && selectedCar && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+            <div className="bg-[#1a1a1a] p-8 rounded-lg max-w-md w-full">
+              <h2 className="text-2xl font-bold text-[#fccc52] mb-4">{selectedCar.name}</h2>
+              <p className="mb-2">{selectedCar.description}</p>
+              <p className="mb-2">Price: ${selectedCar.price} per day</p>
+              <div className='flex gap-4 p-3'>
+              <label className="block mb-4 text-[#fccc52]">
+                From:
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="ml-2 p-2  text-white rounded bg-[#323232]"
+                  required
+                />
+              </label>
+              <label className="block mb-4 text-[#fccc52]">
+                To:
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="ml-2 p-2  text-white rounded bg-[#323232]"
+                  required
+                />
+              </label>
+              </div>
+              
+              <button
+                className="bg-[#fccc52] text-[#323232] px-6 py-2 mt-4 rounded-lg"
+                onClick={handleAddToCart}
+              >
+                Add to Cart
+              </button>
+              <button
+              className="ml-4 text-red-500"
+              onClick={() => setIsModalOpen(false)}
+            >
+              Cancel
+            </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </main>
         </TabPanel>
         <TabPanel value={value} index={1} dir={theme.direction}>
           <div className=" bg-[#3d3c3f] p-4">
