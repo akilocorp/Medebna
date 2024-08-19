@@ -14,7 +14,7 @@ import { useSwipeable } from 'react-swipeable';
 import CartIcon from '@/components/carticon';
 import { getListing } from '@/stores/operator/ApiCallerOperatorHotel';
 import { fetchHotelOwnerProfiles } from '@/stores/operator/hotelprofileapicaller';
-import { FaBed } from 'react-icons/fa';
+import { FaBed, FaUtensils, FaSwimmingPool, FaWifi, FaShower, FaParking, FaAccessibleIcon, FaSpa, FaLanguage, FaBriefcase } from 'react-icons/fa';
 
 interface Facilities {
   popularFacilities: string[];
@@ -99,6 +99,7 @@ function a11yProps(index: number) {
     'aria-controls': `full-width-tabpanel-${index}`,
   };
 }
+
 const categoryDisplayNames: { [key in keyof Facilities]: string } = {
   popularFacilities: 'Popular Facilities',
   roomAmenities: 'Room Amenities',
@@ -117,6 +118,24 @@ const categoryDisplayNames: { [key in keyof Facilities]: string } = {
   languages: 'Languages',
 };
 
+const facilityIcons: { [key in keyof Facilities]: React.ElementType } = {
+  popularFacilities: FaBed,
+  roomAmenities: FaShower,
+  outdoorFacilities: FaSwimmingPool,
+  kitchenFacilities: FaUtensils,
+  mediaTech: FaWifi,
+  foodDrink: FaUtensils,
+  transportFacilities: FaParking,
+  receptionServices: FaAccessibleIcon,
+  cleaningServices: FaSpa,
+  businessFacilities: FaBriefcase,
+  safetyFacilities: FaAccessibleIcon,
+  generalFacilities: FaBed,
+  accessibility: FaAccessibleIcon,
+  wellnessFacilities: FaSpa,
+  languages: FaLanguage,
+};
+
 export default function ChooseRoom() {
   const router = useRouter();
   const { hotelId, hotelname } = router.query;
@@ -133,7 +152,7 @@ export default function ChooseRoom() {
   const [numGuests, setNumGuests] = useState(1);
   const [roomNumber, setRoomNumber] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<keyof Facilities>('popularFacilities');
-  const [searchTerm, setSearchTerm] = useState(''); // Add this state for search functionality
+  const [searchTerm, setSearchTerm] = useState('');
   const [isMounted, setIsMounted] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -152,18 +171,16 @@ export default function ChooseRoom() {
       const roomTypes = await getListing(id);
       if (roomTypes && roomTypes.length > 0) {
         setRooms(roomTypes);
-        setFilteredRooms(roomTypes); // Initialize the filtered rooms with all rooms
+        setFilteredRooms(roomTypes);
       } else {
         console.error('No room types found for this hotel');
       }
     } catch (error) {
       console.error('Error fetching listing data:', error);
-    }
-    finally {
-      setLoading(false); // End loading
+    } finally {
+      setLoading(false);
     }
   };
-  
 
   const fetchHotelProfileData = async (id: string) => {
     setLoading(true);
@@ -177,13 +194,11 @@ export default function ChooseRoom() {
       }
     } catch (error) {
       console.error('Error fetching hotel profile data:', error);
-    }
-    finally {
-      setLoading(false); // End loading
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.target.value.toLowerCase();
     setSearchTerm(searchValue);
@@ -233,6 +248,7 @@ export default function ChooseRoom() {
   if (!isMounted) {
     return null;
   }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#f9f9f9]">
@@ -267,9 +283,6 @@ export default function ChooseRoom() {
 
   return (
     <div className="bg-[#ffffff] min-h-screen text-[#000000]" {...handlers}>
-      <Head>
-        <title>Booking System</title>
-      </Head>
       <AppBar position="static" style={{ backgroundColor: '#ffffff' }}>
         <div className="relative flex justify-between items-center px-4">
           <Tabs
@@ -320,8 +333,8 @@ export default function ChooseRoom() {
                 <input
                   type="text"
                   placeholder="Search"
-                  value={searchTerm} // Bind input value to the searchTerm state
-                  onChange={handleSearchChange} // Handle input change
+                  value={searchTerm}
+                  onChange={handleSearchChange}
                   className="flex-grow px-4 py-2 rounded-full bg-gray-100 border-2 border-[#fccc52] shadow-lg text-[#323232] focus:outline-none focus:border-[#ff914d] hover:border-[#ff914d]"
                 />
                 <button className="sm:ml-4 px-4 py-2 bg-gradient-to-r from-[#fccc52] to-[#ff914d] font-md drop-shadow-md text-[#323232] rounded-lg transition-colors duration-300">
@@ -415,14 +428,13 @@ export default function ChooseRoom() {
                     >
                       <option value="">Select Room Number</option>
                       {selectedRoom.rooms
-                        .filter((room) => room.status === 'available') // Replace 'available' with the actual status indicating availability
+                        .filter((room) => room.status === 'available')
                         .map((room) => (
                           <option key={room.roomNumber} value={room.roomNumber}>
                             {room.roomNumber}
                           </option>
                         ))}
                     </select>
-
                   </div>
 
                   <button
@@ -443,293 +455,278 @@ export default function ChooseRoom() {
           </main>
         </TabPanel>
         <TabPanel value={value} index={1} dir={theme.direction}>
-        {facilities && (
-          <div className="bg-[#ffffff] p-6 rounded-lg">
-            <Typography
-              variant="h4"
-              gutterBottom
-              style={{
-                color: '#ff914d',
-                fontWeight: 'bold',
-                textAlign: 'center',
-                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
-              }}
-            >
-              Hotel Facilities
-            </Typography>
-            <div className="mt-6">
-            <Box
-  mb={8}
-  display="flex"
-  justifyContent="center"
-  flexWrap="wrap"
-  gap={2}
-  sx={{ textAlign: 'center' }}
->
-  {Object.keys(facilities)
-    .filter((category) => category in categoryDisplayNames)
-    .map((category) => (
-      <Button
-        key={category}
-        variant={selectedCategory === category ? 'contained' : 'outlined'}
-        color="primary"
-        onClick={() => setSelectedCategory(category as keyof Facilities)}
-        sx={{
-          textTransform: 'capitalize',
-          backgroundColor: selectedCategory === category ? '#fccc52' : 'transparent',
-          color: selectedCategory === category ? '#ffffff' : '#ff914d',
-          borderColor: '#ff914d',
-          borderRadius: '20px',
-          fontWeight: 'bold',
-          boxShadow: selectedCategory === category ? '0px 4px 15px rgba(0, 0, 0, 0.1)' : 'none',
-          padding: '16px 20px',
-          '&:hover': {
-            backgroundColor: '#fccc52',
-            color: '#6a6a6a',
-            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.12)',
-          },
-          '&.MuiButton-outlined': {
-            borderColor: '#ffffff',
-            backgroundColor: '#f9f9f9',
-            color: '#6a6a6a',
-            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.12)',
-          },
-        }}
-      >
-        {categoryDisplayNames[category as keyof Facilities]}
-      </Button>
-    ))}
-</Box>
-
-            </div>
-            <Box
-              display="grid"
-              gridTemplateColumns="repeat(auto-fill, minmax(220px, 1fr))"
-              gap={3}
-              sx={{
-                padding: '20px',
-                backgroundColor: '#ffffff',
-                borderRadius: '12px',
-              }}
-            >
-              {facilities[selectedCategory].map((item, index) => (
+          {facilities && (
+            <div className="bg-[#ffffff] p-6 rounded-lg">
+              <Typography
+                variant="h4"
+                gutterBottom
+                style={{
+                  color: '#ff914d',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
+                }}
+              >
+                Hotel Facilities
+              </Typography>
+              <div className="mt-6">
                 <Box
-                  key={index}
-                  p={2}
-                  bgcolor="#f9f9f9"
-                  color="#6a6a6a"
-                  borderRadius="12px"
-                  boxShadow="0px 6px 18px rgba(0, 0, 0, 0.15)"
+                  mb={8}
                   display="flex"
-                  alignItems="center"
+                  justifyContent="center"
+                  flexWrap="wrap"
+                  gap={2}
+                  sx={{ textAlign: 'center' }}
+                >
+                  {Object.keys(facilities)
+                    .filter((category) => category in categoryDisplayNames)
+                    .map((category) => {
+                      const Icon = facilityIcons[category as keyof Facilities];
+                      return (
+                        <Button
+                          key={category}
+                          variant={selectedCategory === category ? 'contained' : 'outlined'}
+                          color="primary"
+                          onClick={() => setSelectedCategory(category as keyof Facilities)}
+                          sx={{
+                            textTransform: 'capitalize',
+                            backgroundColor: selectedCategory === category ? '#fccc52' : 'transparent',
+                            color: selectedCategory === category ? '#ffffff' : '#ff914d',
+                            borderColor: '#ff914d',
+                            borderRadius: '20px',
+                            fontWeight: 'bold',
+                            boxShadow: selectedCategory === category ? '0px 4px 15px rgba(0, 0, 0, 0.1)' : 'none',
+                            padding: '16px 20px',
+                            '&:hover': {
+                              backgroundColor: '#fccc52',
+                              color: '#6a6a6a',
+                              boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.12)',
+                            },
+                            '&.MuiButton-outlined': {
+                              borderColor: '#ffffff',
+                              backgroundColor: '#f9f9f9',
+                              color: '#6a6a6a',
+                              boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.12)',
+                            },
+                          }}
+                        >
+                          <Icon style={{ marginRight: '8px' }} />
+                          {categoryDisplayNames[category as keyof Facilities]}
+                        </Button>
+                      );
+                    })}
+                </Box>
+              </div>
+              <Box
+                display="grid"
+                gridTemplateColumns="repeat(auto-fill, minmax(220px, 1fr))"
+                gap={3}
+                sx={{
+                  padding: '20px',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '12px',
+                }}
+              >
+                {facilities[selectedCategory].map((item, index) => {
+                  const Icon = facilityIcons[selectedCategory];
+                  return (
+                    <Box
+                      key={index}
+                      p={2}
+                      bgcolor="#f9f9f9"
+                      color="#6a6a6a"
+                      borderRadius="12px"
+                      boxShadow="0px 6px 18px rgba(0, 0, 0, 0.15)"
+                      display="flex"
+                      alignItems="center"
+                      sx={{
+                        transition: 'transform 0.3s ease',
+                        '&:hover': {
+                          transform: 'translateY(-5px)',
+                        },
+                      }}
+                    >
+                      <Icon style={{ color: '#ff914d', marginRight: '12px', fontSize: '1.5rem' }} />
+                      <Typography
+                        sx={{
+                          fontSize: '1.1rem',
+                          fontWeight: 'bold',
+                          letterSpacing: '0.5px',
+                        }}
+                      >
+                        {item}
+                      </Typography>
+                    </Box>
+                  );
+                })}
+              </Box>
+            </div>
+          )}
+        </TabPanel>
+        <TabPanel value={value} index={2} dir={theme.direction}>
+          {houseRules && (
+            <Box
+              className="bg-[#ffffff] p-8 rounded-3xl shadow-2xl"
+              display="flex"
+              flexDirection="column"
+              gap={6}
+              mx="auto"
+              maxWidth="800px"
+              sx={{
+                transition: 'transform 0.3s ease-in-out',
+                '&:hover': {
+                  transform: 'translateY(-10px)',
+                },
+              }}
+            >
+              <Typography
+                variant="h4"
+                gutterBottom
+                align="center"
+                sx={{
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(90deg, #ff914d, #fccc52)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.2)',
+                }}
+              >
+                House Rules
+              </Typography>
+
+              <Box display="flex" flexDirection="column" gap={4}>
+                <Box
+                  p={4}
                   sx={{
-                    transition: 'transform 0.3s ease',
-                    '&:hover': {
-                      transform: 'translateY(-5px)',
-                    },
+                    backgroundColor: '#ffffff',
+                    color: '#323232',
                   }}
                 >
-                  <FaBed style={{ color: '#ff914d', marginRight: '12px', fontSize: '1.5rem' }} />
-                  <Typography
-                    sx={{
-                      fontSize: '1.1rem',
-                      fontWeight: 'bold',
-                      letterSpacing: '0.5px',
-                    }}
-                  >
-                    {item}
+                  <Typography variant="h6" gutterBottom fontWeight="bold" style={{
+                    color: '#ff914d',
+                    fontWeight: 'bold',
+                    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
+                  }}>
+                    Check-in
                   </Typography>
+                  <Typography fontSize="1.1rem">{houseRules.checkIn.time}</Typography>
+                  <Typography fontSize="1rem">{houseRules.checkIn.description}</Typography>
                 </Box>
-              ))}
+
+                <Box
+                  p={4}
+                  borderRadius="20px"
+                  sx={{
+                    backgroundColor: '#ffffff',
+                    color: '#323232',
+                  }}
+                >
+                  <Typography variant="h6" gutterBottom fontWeight="bold" style={{
+                    color: '#ff914d',
+                    fontWeight: 'bold',
+                    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
+                  }}>
+                    Check-out
+                  </Typography>
+                  <Typography fontSize="1.1rem">{houseRules.checkOut.time}</Typography>
+                  <Typography fontSize="1rem">{houseRules.checkOut.description}</Typography>
+                </Box>
+
+                <Box
+                  p={4}
+                  borderRadius="20px"
+                  sx={{
+                    backgroundColor: '#ffffff',
+                    color: '#323232',
+                  }}
+                >
+                  <Typography variant="h6" gutterBottom fontWeight="bold" style={{
+                    color: '#ff914d',
+                    fontWeight: 'bold',
+                    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
+                  }}>
+                    Cancellation/ prepayment
+                  </Typography>
+                  <Typography fontSize="1rem">{houseRules.cancellationPrepayment}</Typography>
+                </Box>
+
+                <Box
+                  p={4}
+                  borderRadius="20px"
+                  sx={{
+                    backgroundColor: '#ffffff',
+                    color: '#323232',
+                  }}
+                >
+                  <Typography variant="h6" gutterBottom fontWeight="bold" style={{
+                    color: '#ff914d',
+                    fontWeight: 'bold',
+                    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
+                  }}>
+                    Children and beds
+                  </Typography>
+                  <Typography fontSize="1.1rem">{houseRules.childrenAndBeds}</Typography>
+                  <Typography fontSize="1rem">{houseRules.cribsAndExtraBedPolicies}</Typography>
+                </Box>
+
+                <Box
+                  p={4}
+                  borderRadius="20px"
+                  sx={{
+                    backgroundColor: '#ffffff',
+                    color: '#323232',
+                  }}
+                >
+                  <Typography variant="h6" gutterBottom fontWeight="bold" style={{
+                    color: '#ff914d',
+                    fontWeight: 'bold',
+                    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
+                  }}>
+                    No age restriction
+                  </Typography>
+                  <Typography fontSize="1.1rem">{houseRules.noAgeRestriction}</Typography>
+                </Box>
+
+                <Box
+                  p={4}
+                  borderRadius="20px"
+                  sx={{
+                    backgroundColor: '#ffffff',
+                    color: '#323232',
+                  }}
+                >
+                  <Typography variant="h6" gutterBottom fontWeight="bold" style={{
+                    color: '#ff914d',
+                    fontWeight: 'bold',
+                    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
+                  }}>
+                    Pets
+                  </Typography>
+                  <Typography fontSize="1.1rem">{houseRules.pets}</Typography>
+                </Box>
+
+                <Box
+                  p={4}
+                  borderRadius="20px"
+                  sx={{
+                    backgroundColor: '#ffffff',
+                    color: '#323232',
+                  }}
+                >
+                  <Typography variant="h6" gutterBottom fontWeight="bold" style={{
+                    color: '#ff914d',
+                    fontWeight: 'bold',
+                    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
+                  }}>
+                    Accepted payment methods
+                  </Typography>
+                  <Typography fontSize="1.1rem">{houseRules.acceptedPaymentMethods}</Typography>
+                </Box>
+              </Box>
             </Box>
-          </div>
-        )}
-      </TabPanel>
-
-
-
-
-      <TabPanel value={value} index={2} dir={theme.direction}>
-  {houseRules && (
-    <Box
-      className="bg-[#ffffff] p-8 rounded-3xl shadow-2xl"
-      display="flex"
-      flexDirection="column"
-      gap={6}
-      mx="auto"
-      maxWidth="800px"
-      sx={{
-        transition: 'transform 0.3s ease-in-out',
-        '&:hover': {
-          transform: 'translateY(-10px)',
-        },
-      }}
-    >
-      <Typography
-        variant="h4"
-        gutterBottom
-        align="center"
-        sx={{
-          fontWeight: 'bold',
-          background: 'linear-gradient(90deg, #ff914d, #fccc52)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          textShadow: '2px 2px 4px rgba(0, 0, 0, 0.2)',
-        }}
-      >
-        House Rules
-      </Typography>
-
-      <Box display="flex" flexDirection="column" gap={4}>
-        <Box
-          p={4}
-          sx={{
-            backgroundColor: '#ffffff',
-            color: '#323232',
-          }}
-        >
-          <Typography variant="h6" gutterBottom fontWeight="bold"  style={{
-                color: '#ff914d',
-                fontWeight: 'bold',
-               
-                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
-              }}>
-            Check-in
-          </Typography>
-          <Typography fontSize="1.1rem">{houseRules.checkIn.time}</Typography>
-          <Typography fontSize="1rem">{houseRules.checkIn.description}</Typography>
-        </Box>
-
-        <Box
-          p={4}
-          borderRadius="20px"
-          sx={{
-            backgroundColor: '#ffffff',
-            color: '#323232',
-           
-          }}
-        >
-          <Typography variant="h6" gutterBottom fontWeight="bold"  style={{
-                color: '#ff914d',
-                fontWeight: 'bold',
-                
-                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
-              }}>
-            Check-out
-          </Typography>
-          <Typography fontSize="1.1rem">{houseRules.checkOut.time}</Typography>
-          <Typography fontSize="1rem">{houseRules.checkOut.description}</Typography>
-        </Box>
-
-        <Box
-          p={4}
-          borderRadius="20px"
-          sx={{
-            backgroundColor: '#ffffff',
-            color: '#323232',
-          }}
-        >
-          <Typography variant="h6" gutterBottom fontWeight="bold"  style={{
-                color: '#ff914d',
-                fontWeight: 'bold',
-                
-                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
-              }}>
-            Cancellation/ prepayment
-          </Typography>
-          <Typography fontSize="1rem">{houseRules.cancellationPrepayment}</Typography>
-        </Box>
-
-        <Box
-          p={4}
-          borderRadius="20px"
-          sx={{
-            backgroundColor: '#ffffff',
-            color: '#323232',
-          }}
-        >
-          <Typography variant="h6" gutterBottom fontWeight="bold"  style={{
-                color: '#ff914d',
-                fontWeight: 'bold',
-                
-                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
-              }}>
-            Children and beds
-          </Typography>
-          <Typography fontSize="1.1rem">{houseRules.childrenAndBeds}</Typography>
-          <Typography fontSize="1rem">{houseRules.cribsAndExtraBedPolicies}</Typography>
-        </Box>
-
-        <Box
-          p={4}
-          borderRadius="20px"
-          sx={{
-            backgroundColor: '#ffffff',
-            color: '#323232',
-           
-          }}
-        >
-          <Typography variant="h6" gutterBottom fontWeight="bold"  style={{
-                color: '#ff914d',
-                fontWeight: 'bold',
-                
-                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
-              }}>
-            No age restriction
-          </Typography>
-          <Typography fontSize="1.1rem">{houseRules.noAgeRestriction}</Typography>
-        </Box>
-
-        <Box
-          p={4}
-          borderRadius="20px"
-          sx={{
-            backgroundColor: '#ffffff',
-            color: '#323232',
-            
-          }}
-        >
-          <Typography variant="h6" gutterBottom fontWeight="bold"  style={{
-                color: '#ff914d',
-                fontWeight: 'bold',
-                
-                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
-              }}>
-            Pets
-          </Typography>
-          <Typography fontSize="1.1rem">{houseRules.pets}</Typography>
-        </Box>
-
-        <Box
-          p={4}
-          borderRadius="20px"
-          sx={{
-            backgroundColor: '#ffffff',
-            color: '#323232',
-            
-          }}
-        >
-          <Typography variant="h6" gutterBottom fontWeight="bold"  style={{
-                color: '#ff914d',
-                fontWeight: 'bold',
-                
-                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.2)',
-              }}>
-            Accepted payment methods
-          </Typography>
-          <Typography fontSize="1.1rem">{houseRules.acceptedPaymentMethods}</Typography>
-        </Box>
-      </Box>
-    </Box>
-  )}
-</TabPanel>
-
-
-
-
-
+          )}
+        </TabPanel>
       </div>
     </div>
   );
 }
-

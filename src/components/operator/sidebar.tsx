@@ -103,13 +103,7 @@ const OperatorSidebar = () => {
           </a>
         </Link>
       </div>
-      <div className="mt-2 w-full">
-        <Link href="/" legacyBehavior>
-          <a className=" text-black hover:text-[#ff194d] drop-shadow-md font-md px-4 py-2 rounded flex items-center transition-colors duration-300">
-            <FiLogOut className="mr-2 drop-shadow-md font-md" /> Logout
-          </a>
-        </Link>
-      </div>
+     
     </div>
   );
 };

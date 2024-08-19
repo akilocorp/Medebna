@@ -53,17 +53,21 @@ const ViewListingsPage = () => {
   }, []);
 
   const handleDelete = async (listingId: string, roomTypeId: string) => {
-    try {
-      const listing = listings.find(listing => listing._id === listingId);
-      if (listing) {
-        await deleteListing(listingId);
-        setListings(listings.filter(l => l._id !== listingId)); // Update the state by filtering out the deleted listing
-        showToast("Room type deleted successfully", "success");
+    const confirmDelete = window.confirm("Are you sure you want to delete this room type? This action cannot be undone.");
+    if (confirmDelete) {
+      try {
+        const listing = listings.find(listing => listing._id === listingId);
+        if (listing) {
+          await deleteListing(listingId);
+          setListings(listings.filter(l => l._id !== listingId)); // Update the state by filtering out the deleted listing
+          showToast("Room type deleted successfully", "success");
+        }
+      } catch (error) {
+        showToast("Error deleting room type", "error");
       }
-    } catch (error) {
-      showToast("Error deleting room type", "error");
     }
   };
+  
 
   const handleEdit = (listingId: string, roomTypeId: string) => {
     const listing = listings.find(listing => listing._id === listingId);

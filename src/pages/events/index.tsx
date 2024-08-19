@@ -1,5 +1,4 @@
 import CartIcon from '@/components/carticon';
-import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ReactElement, useState } from 'react';
@@ -40,81 +39,88 @@ export default function ChooseEventCompany() {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       if (i <= rating) {
-        stars.push(<FaStar key={i} className="text-yellow-500" />);
+        stars.push(<FaStar key={i} className="text-[#ff914d]" />);
       } else if (i - 0.5 === rating) {
-        stars.push(<FaStarHalfAlt key={i} className="text-yellow-500" />);
+        stars.push(<FaStarHalfAlt key={i} className="text-[#ff914d]" />);
       } else {
-        stars.push(<FaRegStar key={i} className="text-yellow-500" />);
+        stars.push(<FaRegStar key={i} className="text-[#ff914d]" />);
       }
     }
     return stars;
   };
 
   return (
-    <div className="bg-[#1a1a1a] min-h-screen text-[#ffffff]">
-      <Head>
-        <title>Event Booking System</title>
-      </Head>
+    <div className="bg-[#ffffff] min-h-screen text-[#323232] relative">
+      
       <div className="p-4">
         <Link href="/" legacyBehavior>
-          <a className="inline-flex items-center text-[#fccc52] mb-8 px-4 py-2 bg-[#323232] rounded-lg hover:bg-[#fccc52] hover:text-[#323232] transition-colors duration-300">
+          <a className="inline-flex items-center bg-gradient-to-r from-[#fccc52] to-[#ff914d] text-[#323232] mb-8 px-4 py-2 bg-opacity-90 rounded-lg hover:bg-[#fccc52] hover:text-[#ffffff] transition-colors duration-300">
             <IoChevronBack className="mr-2 text-2xl" />
-            <span className="font-bold text-lg"></span>
           </a>
         </Link>
       </div>
+
       {/* Cart Icon positioned at the top right */}
       <div className="absolute top-4 right-4">
         <CartIcon />
       </div>
-        <div className="w-full max-w-7xl p-4 mx-auto">
-  <div className="relative flex flex-col lg:flex-row justify-between py-4 px-6 bg-gradient-to-r from-[#1a1a1a] to-transparent rounded-lg">
-    <div className="flex flex-col w-full lg:w-3/4">
-      <h1 className="text-3xl lg:text-4xl font-bold mb-4">Choose Your Event Company</h1>
-      <div className="flex flex-col sm:flex-row items-center mb-4">
-        <input
-          type="text"
-          placeholder="Search"
-          className="flex w-full sm:w-1/2 px-4 py-2 rounded-lg bg-[#fccc52] bg-opacity-30 text-gray-500 mb-2 sm:mb-0"
-        />
-        <button className="sm:ml-4 px-4 py-2 rounded-lg bg-[#323232] text-[#fccc52]">
-          Search
-        </button>
+
+      <div className="w-full max-w-6xl p-4 mx-auto">
+        <div className="relative flex flex-col lg:flex-row justify-between py-4 px-6 rounded-lg">
+          <div className="flex flex-col w-full lg:w-3/4">
+            <h1 className="text-3xl lg:text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#fccc52] to-[#ff914d] drop-shadow-md">Choose Your Event Company</h1>
+            <div className="flex flex-col sm:flex-row items-center mb-4">
+              <input
+                type="text"
+                placeholder="Search"
+                className="flex w-full sm:w-1/2 px-4 py-2 rounded-full bg-gray-100 border-2 border-[#fccc52] shadow-lg text-[#323232] mb-2 sm:mb-0 focus:outline-none focus:border-[#ff914d] hover:border-[#ff914d]"
+              />
+              <button className="sm:ml-4 px-4 py-2 bg-gradient-to-r from-[#fccc52] to-[#ff914d] font-md drop-shadow-md text-[#323232] rounded-lg transition-colors duration-300">
+                Search
+              </button>
+            </div>
+            <p className="text-lg leading-relaxed text-[#323232] drop-shadow-md">
+              Discover the best event companies to make your occasion unforgettable.
+            </p>
+          </div>
+          <div className="mt-4 lg:mt-0 flex items-center justify-end lg:absolute lg:top-0 lg:right-0 lg:w-1/2 h-64 lg:h-full rounded-lg overflow-hidden">
+            <img
+              src="/assets/eventt.png"
+              alt="Event Planning"
+              className="w-1/2 h-full object-cover transform translate-x-4 scale-110"
+            />
+          </div>
+        </div>
       </div>
-      <p className="text-lg leading-relaxed">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
-        efficitur.
-      </p>
-    </div>
-    <div
-      className="mt-4 lg:mt-0 lg:absolute lg:top-0 lg:right-0 lg:w-1/2 h-64 lg:h-full bg-cover bg-center rounded-lg"
-      style={{
-        backgroundImage: "linear-gradient(to bottom right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/assets/eventt.png')",
-      }}
-    />
-  </div>
-</div>
-     
-      <main className="bg-[#3d3c3f] bg-opacity-100 p-8 flex flex-col">
+
+      <main className="bg-[#ffffff] p-8 flex flex-col">
         <div className="flex justify-center items-center p-8">
-          <div className="w-full max-w-7xl">
+          <div className="w-full max-w-6xl flex flex-col items-center p-4 mx-auto">
             <div className="flex flex-wrap justify-between gap-8">
               {eventCompanies.map((eventCompany) => (
                 <div
                   key={eventCompany.id}
-                  className={`w-full sm:w-[48%] lg:w-[30%] bg-[#323232] text-white rounded-xl shadow-lg cursor-pointer transform transition-transform duration-300 hover:scale-105 ${selectedEventCompany === eventCompany ? 'border-4 border-[#fccc52]' : ''}`}
+                  className="w-[320px] md:w-[350px] bg-[#ff914d] bg-opacity-5 rounded-3xl shadow-lg flex-shrink-0 transform transition duration-500 hover:scale-105 hover:shadow-2xl flex flex-col overflow-hidden cursor-pointer"
                   onClick={() => handleEventCompanyClick(eventCompany)}
                 >
-                  <img src={eventCompany.image} alt={eventCompany.name} className="rounded-lg mb-4" />
-                  <div className="px-4 flex justify-between w-full items-center">
+                  <div className="w-full h-48 bg-gray-300 rounded-t-3xl overflow-hidden mb-4">
+                    <img
+                      src={eventCompany.image}
+                      alt={eventCompany.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="px-6 py-4 flex justify-between w-full items-center">
                     <div>
-                      <h3 className="text-lg font-bold text-gray-200 text-left">{eventCompany.name}</h3>
-                      <p className="text-left mb-2 text-sm text-gray-300">{eventCompany.description}</p>
-                      <div className="flex">
-                        {renderStars(eventCompany.rating)}
-                      </div>
+                      <h3 className="text-xl font-extrabold text-gray-800 drop-shadow-md text-left">
+                        {eventCompany.name}
+                      </h3>
+                      <p className="text-left mb-2 text-sm text-gray-600 drop-shadow-md">
+                        {eventCompany.description}
+                      </p>
+                      <div className="flex mb-2">{renderStars(eventCompany.rating)}</div>
                     </div>
-                    <div className="text-2xl text-[#fccc52] mb-2">
+                    <div className="text-3xl text-[#fccc52]">
                       {eventCompany.icon}
                     </div>
                   </div>

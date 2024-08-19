@@ -140,9 +140,7 @@ export default function ChooseHotel() {
 
   return (
     <div className="bg-[#ffffff] min-h-screen text-[#323232] relative">
-      <Head>
-        <title>Booking System</title>
-      </Head>
+      
       <div className="p-4">
         <Link href="/" legacyBehavior>
           <a className="inline-flex items-center bg-gradient-to-r from-[#fccc52] to-[#ff914d] text-[#323232] mb-8 px-4 py-2 bg-[#ff914d] bg-opacity-90 rounded-lg hover:bg-[#fccc52] hover:text-[#ffffff] transition-colors duration-300">

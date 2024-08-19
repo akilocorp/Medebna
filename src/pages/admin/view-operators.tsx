@@ -36,6 +36,8 @@ const ViewOperatorsPage = () => {
   }, []);
 
   const handleDelete = async (id: string) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this operator? This action cannot be undone.");
+  if (confirmDelete) {
     try {
       await deleteOperator(id);
       setOperators(operators.filter(operator => operator.id !== id));
@@ -43,7 +45,8 @@ const ViewOperatorsPage = () => {
     } catch (error) {
       showToast("Error deleting operator", "error");
     }
-  };
+  }
+};
 
   const handleEdit = (operator: Operator) => {
     setSelectedOperator(operator);

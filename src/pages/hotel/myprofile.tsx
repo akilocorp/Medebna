@@ -6,7 +6,7 @@ import OperatorLayout from '@/components/operator/operatorLayout';
 import { FaStar, FaStarHalfAlt, FaRegStar, FaEdit } from 'react-icons/fa';
 import { RiUploadCloudFill } from 'react-icons/ri';
 import { CldUploadWidget } from 'next-cloudinary';
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
 interface Facilities {
   popularFacilities: string[];
@@ -102,11 +102,12 @@ const ViewHotelOwnerProfile: React.FC = () => {
   const router = useRouter();
   const { id: queryId } = router.query;
   const [ownerName, setOwnerName] = useState<string | null>(null);
+  const [facilityInputs, setFacilityInputs] = useState<Partial<Record<keyof Facilities, string>>>({});
+
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Decode the token to get the hotel owner ID
         const token = localStorage.getItem('token');
         if (token) {
           const decoded: any = jwt.decode(token);
@@ -150,17 +151,31 @@ const ViewHotelOwnerProfile: React.FC = () => {
     }));
   };
 
-  const handleFacilityChange = (e: React.ChangeEvent<HTMLInputElement>, facilityType: keyof Facilities) => {
+  const handleFacilityInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    facilityType: keyof Facilities
+  ) => {
     const { value } = e.target;
-    setProfileData(prevState => ({
+    setFacilityInputs(prevState => ({
       ...prevState,
-      facilities: {
-        ...prevState.facilities,
-        [facilityType]: value.split(',').map(item => item.trim()),
-      },
+      [facilityType]: value,
     }));
   };
 
+  const handleFacilityBlur = (facilityType: keyof Facilities) => {
+    const inputValue = facilityInputs[facilityType];
+  
+    if (inputValue && typeof inputValue === 'string') {
+      setProfileData(prevState => ({
+        ...prevState,
+        facilities: {
+          ...prevState.facilities,
+          [facilityType]: inputValue.split(',').map((item: string) => item.trim()),
+        },
+      }));
+    }
+  };
+  
   const handleHouseRuleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     ruleType: keyof HouseRules
@@ -189,13 +204,20 @@ const ViewHotelOwnerProfile: React.FC = () => {
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      Object.keys(facilityInputs).forEach(key => {
+        const facilityType = key as keyof Facilities;
+        if (facilityInputs[facilityType]) {
+          profileData.facilities[facilityType] = facilityInputs[facilityType]!.split(',').map(item => item.trim());
+        }
+      });
+
       const updatedProfile = await updateHotelOwnerProfile(profileData._id, profileData);
-      setProfileData(updatedProfile); // Set the returned hotelProfile directly
-      toast.success("Profile updated successfully.");
+      setProfileData(updatedProfile);
+      toast.success('Profile updated successfully.');
       setIsEditing(false);
     } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Error updating profile.");
+      console.error('Error updating profile:', error);
+      toast.error('Error updating profile.');
     }
   };
 
@@ -294,7 +316,6 @@ const ViewHotelOwnerProfile: React.FC = () => {
       </div>
     );
   }
-  
 
   return (
     <OperatorLayout>
@@ -390,8 +411,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="popularFacilities"
                       type="text"
-                      value={profileData.facilities.popularFacilities.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'popularFacilities')}
+                      value={facilityInputs.popularFacilities || profileData.facilities.popularFacilities.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'popularFacilities')}
+                      onBlur={() => handleFacilityBlur('popularFacilities')}
                       placeholder="Enter popular facilities"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -401,8 +423,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="roomAmenities"
                       type="text"
-                      value={profileData.facilities.roomAmenities.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'roomAmenities')}
+                      value={facilityInputs.roomAmenities || profileData.facilities.roomAmenities.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'roomAmenities')}
+                      onBlur={() => handleFacilityBlur('roomAmenities')}
                       placeholder="Enter room amenities"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -412,8 +435,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="outdoorFacilities"
                       type="text"
-                      value={profileData.facilities.outdoorFacilities.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'outdoorFacilities')}
+                      value={facilityInputs.outdoorFacilities || profileData.facilities.outdoorFacilities.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'outdoorFacilities')}
+                      onBlur={() => handleFacilityBlur('outdoorFacilities')}
                       placeholder="Enter outdoor facilities"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -423,8 +447,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="kitchenFacilities"
                       type="text"
-                      value={profileData.facilities.kitchenFacilities.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'kitchenFacilities')}
+                      value={facilityInputs.kitchenFacilities || profileData.facilities.kitchenFacilities.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'kitchenFacilities')}
+                      onBlur={() => handleFacilityBlur('kitchenFacilities')}
                       placeholder="Enter kitchen facilities"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -434,8 +459,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="mediaTech"
                       type="text"
-                      value={profileData.facilities.mediaTech.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'mediaTech')}
+                      value={facilityInputs.mediaTech || profileData.facilities.mediaTech.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'mediaTech')}
+                      onBlur={() => handleFacilityBlur('mediaTech')}
                       placeholder="Enter media & tech"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -445,8 +471,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="foodDrink"
                       type="text"
-                      value={profileData.facilities.foodDrink.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'foodDrink')}
+                      value={facilityInputs.foodDrink || profileData.facilities.foodDrink.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'foodDrink')}
+                      onBlur={() => handleFacilityBlur('foodDrink')}
                       placeholder="Enter food & drink"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -456,8 +483,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="transportFacilities"
                       type="text"
-                      value={profileData.facilities.transportFacilities.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'transportFacilities')}
+                      value={facilityInputs.transportFacilities || profileData.facilities.transportFacilities.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'transportFacilities')}
+                      onBlur={() => handleFacilityBlur('transportFacilities')}
                       placeholder="Enter transport facilities"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -467,8 +495,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="receptionServices"
                       type="text"
-                      value={profileData.facilities.receptionServices.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'receptionServices')}
+                      value={facilityInputs.receptionServices || profileData.facilities.receptionServices.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'receptionServices')}
+                      onBlur={() => handleFacilityBlur('receptionServices')}
                       placeholder="Enter reception services"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -478,8 +507,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="cleaningServices"
                       type="text"
-                      value={profileData.facilities.cleaningServices.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'cleaningServices')}
+                      value={facilityInputs.cleaningServices || profileData.facilities.cleaningServices.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'cleaningServices')}
+                      onBlur={() => handleFacilityBlur('cleaningServices')}
                       placeholder="Enter cleaning services"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -489,8 +519,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="businessFacilities"
                       type="text"
-                      value={profileData.facilities.businessFacilities.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'businessFacilities')}
+                      value={facilityInputs.businessFacilities || profileData.facilities.businessFacilities.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'businessFacilities')}
+                      onBlur={() => handleFacilityBlur('businessFacilities')}
                       placeholder="Enter business facilities"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -500,8 +531,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="safetyFacilities"
                       type="text"
-                      value={profileData.facilities.safetyFacilities.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'safetyFacilities')}
+                      value={facilityInputs.safetyFacilities || profileData.facilities.safetyFacilities.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'safetyFacilities')}
+                      onBlur={() => handleFacilityBlur('safetyFacilities')}
                       placeholder="Enter safety facilities"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -511,8 +543,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="generalFacilities"
                       type="text"
-                      value={profileData.facilities.generalFacilities.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'generalFacilities')}
+                      value={facilityInputs.generalFacilities || profileData.facilities.generalFacilities.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'generalFacilities')}
+                      onBlur={() => handleFacilityBlur('generalFacilities')}
                       placeholder="Enter general facilities"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -522,8 +555,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="accessibility"
                       type="text"
-                      value={profileData.facilities.accessibility.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'accessibility')}
+                      value={facilityInputs.accessibility || profileData.facilities.accessibility.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'accessibility')}
+                      onBlur={() => handleFacilityBlur('accessibility')}
                       placeholder="Enter accessibility"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -533,8 +567,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="wellnessFacilities"
                       type="text"
-                      value={profileData.facilities.wellnessFacilities.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'wellnessFacilities')}
+                      value={facilityInputs.wellnessFacilities || profileData.facilities.wellnessFacilities.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'wellnessFacilities')}
+                      onBlur={() => handleFacilityBlur('wellnessFacilities')}
                       placeholder="Enter wellness facilities"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -544,8 +579,9 @@ const ViewHotelOwnerProfile: React.FC = () => {
                     <input
                       name="languages"
                       type="text"
-                      value={profileData.facilities.languages.join(', ')}
-                      onChange={(e) => handleFacilityChange(e, 'languages')}
+                      value={facilityInputs.languages || profileData.facilities.languages.join(', ')}
+                      onChange={(e) => handleFacilityInputChange(e, 'languages')}
+                      onBlur={() => handleFacilityBlur('languages')}
                       placeholder="Enter languages"
                       className="w-full p-3 rounded-full bg-[#ffffff] text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] shadow-md"
                     />
@@ -687,7 +723,6 @@ const ViewHotelOwnerProfile: React.FC = () => {
                 </button>
               </div>
             </form>
-
           ) : (
             <div>
               <div className="flex items-center mb-8">
@@ -785,16 +820,16 @@ const ViewHotelOwnerProfile: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <h4 className="font-bold text-[#ff914d] text-opacity-50">Check-In</h4>
-                    <p className='text-xs mt-4 text-[#ff914d] text-opacity-50'>Check-In Time</p>
+                    <p className="text-xs mt-4 text-[#ff914d] text-opacity-50">Check-In Time</p>
                     <p className="text-black">{profileData.houseRules.checkIn.time || 'N/A'}</p>
-                    <p className='text-xs text-[#ff914d] text-opacity-50'>Check-In Description</p>
+                    <p className="text-xs text-[#ff914d] text-opacity-50">Check-In Description</p>
                     <p className="text-black">{profileData.houseRules.checkIn.description || 'N/A'}</p>
                   </div>
                   <div>
                     <h4 className="font-bold text-[#ff914d] text-opacity-50">Check-Out</h4>
-                    <p className='text-xs mt-4 text-[#ff914d] text-opacity-50'>Check-Out Time</p>
+                    <p className="text-xs mt-4 text-[#ff914d] text-opacity-50">Check-Out Time</p>
                     <p className="text-black">{profileData.houseRules.checkOut.time || 'N/A'}</p>
-                    <p className='text-xs text-[#ff914d] text-opacity-50'>Check-Out Description</p>
+                    <p className="text-xs text-[#ff914d] text-opacity-50">Check-Out Description</p>
                     <p className="text-black">{profileData.houseRules.checkOut.description || 'N/A'}</p>
                   </div>
                   <div>
