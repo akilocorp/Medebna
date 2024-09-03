@@ -1,37 +1,79 @@
-import CartIcon from '@/components/carticon';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { ReactElement, useState } from 'react';
-import { FaCalendarAlt, FaRegStar, FaStar, FaStarHalfAlt } from 'react-icons/fa';
+import { ReactElement, useEffect, useState } from 'react';
+import { FaCalendarAlt, FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import { IoChevronBack } from 'react-icons/io5';
+import CartIcon from '@/components/carticon';
+import { fetchEventOwnerProfile } from '@/stores/operator/eventprofileapicaller';
+import { getHotels } from '@/stores/admin/ApiCallerAdmin';
 
 interface EventCompany {
-  id: number;
+  id: string;
   name: string;
-  description: string;
-  image: string;
+  description?: string;
+  image?: string;
   icon: ReactElement;
-  rating: number;
+  city: string;
+  rating?: number;
+  address?: string;
 }
 
 export default function ChooseEventCompany() {
-  const [selectedEventCompany, setSelectedEventCompany] = useState<EventCompany | null>(null);
+  const [eventCompanies, setEventCompanies] = useState<EventCompany[]>([]);
+  const [filteredEventCompanies, setFilteredEventCompanies] = useState<EventCompany[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const eventCompanies: EventCompany[] = [
-    { id: 1, name: 'Eventify', description: 'Creating unforgettable experiences.', image: '/assets/event.png', icon: <FaCalendarAlt />, rating: 5 },
-    { id: 2, name: 'Eventura', description: 'Bringing your events to life.', image: '/assets/event.png', icon: <FaCalendarAlt />, rating: 4 },
-    { id: 3, name: 'Gala Gatherings', description: 'Elegance and grandeur for your events.', image: '/assets/event.png', icon: <FaCalendarAlt />, rating: 3 },
-    { id: 4, name: 'Fiesta Planners', description: 'Making every event a celebration.', image: '/assets/event.png', icon: <FaCalendarAlt />, rating: 4.5 },
-    { id: 5, name: 'Celebration Experts', description: 'Your event, our expertise.', image: '/assets/event.png', icon: <FaCalendarAlt />, rating: 2 },
-    { id: 6, name: 'Epic Events', description: 'Creating epic moments.', image: '/assets/event.png', icon: <FaCalendarAlt />, rating: 4.5 }
-  ];
+  useEffect(() => {
+    const fetchEventCompanies = async () => {
+      try {
+        const operators = await getHotels();
+        const eventCompanyPromises = operators
+          .filter((operator) => operator.type === 'event')
+          .map(async (eventOperator) => {
+            const profile = await fetchEventOwnerProfile(eventOperator._id);
+            return {
+              id: eventOperator._id,
+              name: eventOperator.name,
+              description: profile?.description || 'No description available.',
+              image: profile?.companyImage || '/assets/default-event.png',
+              icon: <FaCalendarAlt />,
+              rating: profile?.rating || 0,
+              address: profile?.address || 'Address not available',
+              city: profile?.city || 'City not available',
+            };
+          });
+
+        const eventCompanies = await Promise.all(eventCompanyPromises);
+        setEventCompanies(eventCompanies);
+        setFilteredEventCompanies(eventCompanies);
+      } catch (error) {
+        console.error('Error fetching event companies:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEventCompanies();
+  }, []);
+
+  useEffect(() => {
+    const results = eventCompanies.filter((eventCompany) =>
+      eventCompany.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      eventCompany.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      eventCompany.address?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredEventCompanies(results);
+  }, [searchTerm, eventCompanies]);
 
   const handleEventCompanyClick = (eventCompany: EventCompany) => {
-    setSelectedEventCompany(eventCompany);
     router.push({
       pathname: '/events/details',
-      query: { eventCompanyId: eventCompany.id, eventCompanyName: eventCompany.name, eventCompanyDescription: eventCompany.description, eventCompanyImage: eventCompany.image }
+      query: {
+        eventCompanyId: eventCompany.id,
+        eventCompanyName: eventCompany.name,
+      },
     });
   };
 
@@ -48,6 +90,38 @@ export default function ChooseEventCompany() {
     }
     return stars;
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#f9f9f9]">
+        <div className="text-center">
+          <div className="flex justify-center mb-4">
+            <svg
+              className="animate-spin h-10 w-10 text-[#ff914d]"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
+            </svg>
+          </div>
+          <p className="text-[#fccc52] text-lg font-semibold">Loading, please wait...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#ffffff] min-h-screen text-[#323232] relative">
@@ -73,6 +147,8 @@ export default function ChooseEventCompany() {
               <input
                 type="text"
                 placeholder="Search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="flex w-full sm:w-1/2 px-4 py-2 rounded-full bg-gray-100 border-2 border-[#fccc52] shadow-lg text-[#323232] mb-2 sm:mb-0 focus:outline-none focus:border-[#ff914d] hover:border-[#ff914d]"
               />
               <button className="sm:ml-4 px-4 py-2 bg-gradient-to-r from-[#fccc52] to-[#ff914d] font-md drop-shadow-md text-[#323232] rounded-lg transition-colors duration-300">
@@ -97,7 +173,7 @@ export default function ChooseEventCompany() {
         <div className="flex justify-center items-center p-8">
           <div className="w-full max-w-6xl flex flex-col items-center p-4 mx-auto">
             <div className="flex flex-wrap justify-between gap-8">
-              {eventCompanies.map((eventCompany) => (
+              {filteredEventCompanies.map((eventCompany) => (
                 <div
                   key={eventCompany.id}
                   className="w-[320px] md:w-[350px] bg-[#ff914d] bg-opacity-5 rounded-3xl shadow-lg flex-shrink-0 transform transition duration-500 hover:scale-105 hover:shadow-2xl flex flex-col overflow-hidden cursor-pointer"
@@ -116,9 +192,9 @@ export default function ChooseEventCompany() {
                         {eventCompany.name}
                       </h3>
                       <p className="text-left mb-2 text-sm text-gray-600 drop-shadow-md">
-                        {eventCompany.description}
+                        {eventCompany.city}, {eventCompany.address ?? 'Address not available'}
                       </p>
-                      <div className="flex mb-2">{renderStars(eventCompany.rating)}</div>
+                      <div className="flex mb-2">{renderStars(eventCompany.rating ?? 0)}</div>
                     </div>
                     <div className="text-3xl text-[#fccc52]">
                       {eventCompany.icon}
@@ -127,13 +203,6 @@ export default function ChooseEventCompany() {
                 </div>
               ))}
             </div>
-            {selectedEventCompany && (
-              <div className="mt-8 text-center">
-                <h2 className="text-3xl font-bold mb-4 text-[#fccc52]">{selectedEventCompany.name}</h2>
-                <p className="mb-4">{selectedEventCompany.description}</p>
-                <button className="bg-[#fccc52] text-[#323232] px-6 py-2 mt-4 rounded-lg">Book Now</button>
-              </div>
-            )}
           </div>
         </div>
       </main>

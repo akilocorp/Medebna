@@ -47,7 +47,7 @@ const Header = () => {
       if (userType === 'admin') {
         router.push('/admin/add-operator');
       } else if (userType === 'car' || userType === 'event' || userType === 'hotel') {
-        router.push(`/${userType}/profile`);
+        router.push(`/${userType}/myprofile`);
       } else {
         router.push('/');
       }

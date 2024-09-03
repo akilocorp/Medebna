@@ -1,14 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaShoppingCart } from 'react-icons/fa';
 import { useRouter } from 'next/router';
+import { getCartCount } from '@/stores/cart/carapicaller'; // Import the function to get the cart count
 
 const CartIcon = () => {
   const [cartCount, setCartCount] = useState(0);
   const [showCount, setShowCount] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      try {
+        const sessionId = localStorage.getItem('sessionId');
+        if (sessionId) {
+          const count = await getCartCount(sessionId);
+          setCartCount(count);
+          setShowCount(count > 0);
+        }
+      } catch (error) {
+        console.error('Failed to fetch cart count:', error);
+      }
+    };
+
+    fetchCartCount();
+  }, []);
+
   const handleCartClick = () => {
-    setShowCount(false);
     router.push('/cart'); // Navigate to the cart page
   };
 

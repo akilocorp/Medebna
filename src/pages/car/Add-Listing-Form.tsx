@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Field, reduxForm, InjectedFormProps, FieldArray } from 'redux-form';
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
 import { addCarRental } from '@/stores/operator/ApiCallerOperatorCar';
 import OperatorLayout from '@/components/operator/operatorLayout';
+import { CldUploadWidget } from 'next-cloudinary';
+import { RiUploadCloudFill } from 'react-icons/ri';
+import jwt from 'jsonwebtoken';
 
 interface Car {
-  numberOfCars: number;
   type: string;
   price: number;
   image: string;
@@ -18,23 +20,12 @@ interface CarDetails {
   details: string;
   rentalInfo: string;
   additionalInfo: string;
-  language: string;
-}
-
-interface RentalRules {
-  rentalDuration: string;
-  cancellationPolicy: string;
-  prepayment: boolean;
-  noAgeRestriction: boolean;
-  additionalInfo: string;
-  acceptedPaymentMethods: string;
 }
 
 interface FormValues {
-  rating: string;
   cars: Car[];
   carDetails: CarDetails;
-  rentalRules: RentalRules;
+  numberOfCars: number;
 }
 
 const renderField = ({
@@ -49,12 +40,12 @@ const renderField = ({
   meta: { touched: boolean; error?: string };
 }) => (
   <div className="mb-6">
-    <label className="block text-[#fccc52] mb-2 text-lg font-bold">{label}</label>
+    <label className="block text-[#ff914d] mb-2 text-lg font-bold">{label}</label>
     <div className="relative">
       <input
         {...input}
         type={type}
-        className="w-full p-3 rounded-full bg-[#323232] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] focus:border-transparent shadow-md"
+        className="w-full p-3 rounded-full bg-[#ffffff] text-[#323232] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] focus:border-transparent shadow-md"
         placeholder={label}
       />
       {touched && error && <span className="text-red-500 text-sm mt-1 block">{error}</span>}
@@ -62,161 +53,156 @@ const renderField = ({
   </div>
 );
 
-const renderCarFields = ({ fields }: { fields: any }) => (
-  <div>
-    {fields.map((car: any, index: number) => (
-      <div key={index} className="mb-6 p-4 rounded-lg">
-        <h4 className="text-lg font-bold mb-2 text-[#fccc52]">Car #{index + 1}</h4>
-        <Field name={`${car}.numberOfCars`} type="number" component={renderField} label="Number of Cars" />
-        <Field name={`${car}.type`} type="text" component={renderField} label="Car Type" />
-        <Field name={`${car}.price`} type="number" component={renderField} label="Price" />
-        <Field name={`${car}.image`} type="text" component={renderField} label="Image URL" />
-        <Field name={`${car}.description`} type="text" component={renderField} label="Description" />
-        <Field name={`${car}.status`} component="select" className="w-full p-3 rounded-full bg-[#323232] text-white focus:outline-none focus:ring-2 focus:ring-[#fccc52] focus:border-transparent shadow-md">
-          <option value="Available">Available</option>
-          <option value="Rented">Rented</option>
-        </Field>
-        <button
-          type="button"
-          onClick={() => fields.remove(index)}
-          className="mt-4 bg-red-500 text-white px-4 py-2 rounded-full font-bold text-sm shadow-md"
-        >
-          Remove Car
-        </button>
-      </div>
-    ))}
-    <button
-      type="button"
-      onClick={() => fields.push({})}
-      className="bg-[#fccc52] text-[#323232] px-4 py-2 mt-6 rounded-full font-bold text-lg shadow-md"
-    >
-      Add Car
-    </button>
-  </div>
-);
+const renderImageUpload = ({ input, label }: any) => {
+  const [imageUrl, setImageUrl] = useState<string | null>(input.value);
 
-const renderCarDetailsFields = () => (
-  <div className="mb-6 p-4 rounded-lg">
-    <h4 className="text-lg font-bold mb-4 text-white">Car Details</h4>
-    <Field name="carDetails.details" type="text" component={renderField} label="Details" />
-    <Field name="carDetails.rentalInfo" type="text" component={renderField} label="Rental Info" />
-    <Field name="carDetails.additionalInfo" type="text" component={renderField} label="Additional Info" />
-    <Field name="carDetails.language" type="text" component={renderField} label="Language" />
-  </div>
-);
-
-const renderRentalRulesFields = () => (
-  <div className="mb-6 p-4 rounded-lg">
-    <h4 className="text-lg font-bold mb-4 text-white">Rental Rules</h4>
-    <Field name="rentalRules.rentalDuration" type="text" component={renderField} label="Rental Duration" />
-    <Field name="rentalRules.cancellationPolicy" type="text" component={renderField} label="Cancellation Policy" />
-    <Field name="rentalRules.prepayment" type="checkbox" component={renderField} label="Prepayment Required" />
-    <Field name="rentalRules.noAgeRestriction" type="checkbox" component={renderField} label="No Age Restriction" />
-    <Field name="rentalRules.additionalInfo" type="text" component={renderField} label="Additional Info" />
-    <Field name="rentalRules.acceptedPaymentMethods" type="text" component={renderField} label="Accepted Payment Methods" />
-  </div>
-);
-
-const MultiStepForm: React.FC<InjectedFormProps<FormValues>> = ({ handleSubmit }) => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const router = useRouter();
-
-  const nextStep = () => setCurrentStep(currentStep + 1);
-  const previousStep = () => setCurrentStep(currentStep - 1);
-
-  const onSubmit = async (values: FormValues) => {
-    const formattedValues = {
-      ...values,
-      rating: parseFloat(values.rating),
-      cars: values.cars.map((car) => ({
-        ...car,
-        price: parseFloat(car.price.toString()),
-        numberOfCars: parseInt(car.numberOfCars.toString(), 10),
-      })),
-    };
-
-    try {
-      await addCarRental(formattedValues);
-      toast.success("Car rental added successfully");
-      router.push("/operator/view-cars");
-    } catch (error) {
-      toast.error("Error adding car rental");
-    }
-  };
-
-  const renderStep = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <>
-            <Field name="rating" component={renderField} type="number" label="Rating" />
-          </>
-        );
-      case 2:
-        return (
-          <div className='overflow-y-auto max-h-96'>
-            <FieldArray name="cars" component={renderCarFields} />
-          </div>
-        );
-      case 3:
-        return (
-          <div className='overflow-y-auto max-h-96'>
-            {renderCarDetailsFields()}
-          </div>
-        );
-      case 4:
-        return (
-          <div className='overflow-y-auto max-h-96'>
-            {renderRentalRulesFields()}
-          </div>
-        );
-      default:
-        return null;
+  const handleUpload = (result: any) => {
+    if (result.event === "success") {
+      const imageUrl = result.info.secure_url;
+      input.onChange(imageUrl);
+      setImageUrl(imageUrl);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl mx-auto mt-8 p-6 bg-[#1a1a1a] rounded-lg shadow-lg">
-      {renderStep()}
-      <div className="flex justify-between mt-6">
-        {currentStep > 1 && (
+    <div className="relative mb-4">
+      <label className="block text-[#ff914d] mb-2 text-lg font-bold">{label}</label>
+      <CldUploadWidget
+        uploadPreset="u06vgrf1" // your upload preset here
+        onSuccess={handleUpload}
+      >
+        {({ open }) => (
           <button
             type="button"
-            onClick={previousStep}
-            className="bg-[#fccc52] text-[#323232] px-6 py-3 rounded-full font-bold text-lg shadow-md"
+            className="block w-40 p-2 py-2 rounded-full border text-[#323232] border-[#fccc52] cursor-pointer flex items-center justify-center bg-[#ffffff] shadow-md"
+            onClick={(e) => {
+              e.preventDefault();
+              open();
+            }}
           >
-            Previous
+            <RiUploadCloudFill className="mr-2 text-lg text-[#ff914d]" />
+            {imageUrl ? "Change Image" : "Upload Image"}
           </button>
         )}
-        {currentStep < 4 ? (
-          <button
-            type="button"
-            onClick={nextStep}
-            className="bg-[#fccc52] text-[#323232] px-6 py-3 rounded-full font-bold text-lg shadow-md"
-          >
-            Next
-          </button>
-        ) : (
-          <button
-            type="submit"
-            className="bg-[#fccc52] text-[#323232] px-6 py-3 rounded-full font-bold text-lg shadow-md"
-          >
-            Submit
-          </button>
-        )}
+      </CldUploadWidget>
+      {imageUrl && (
+        <div className="mt-4">
+          <img src={imageUrl} alt="Preview" className="w-32 h-32 rounded-lg shadow-md" />
+        </div>
+      )}
+    </div>
+  );
+};
+
+const renderCarFields = ({ fields }: { fields: any }) => {
+  useEffect(() => {
+    if (fields.length === 0) {
+      fields.push({});
+    }
+  }, [fields]);
+
+  return (
+    <div>
+      {fields.map((car: any, index: number) => (
+        <div key={index} className="mb-6 p-4 rounded-lg bg-[#ffffff] ">
+          <h4 className="text-lg font-bold mb-2 text-[#ff914d]">Car #{index + 1}</h4>
+          <Field name={`${car}.type`} type="text" component={renderField} label="Car Type" validate={[required]} />
+          <Field name={`${car}.price`} type="number" component={renderField} label="Price" validate={[required, number]} />
+          <Field name={`${car}.image`} component={renderImageUpload} label="Image URL" />
+          <Field name={`${car}.description`} type="text" component={renderField} label="Description" validate={[required]} />
+          <Field name={`${car}.status`} component="select" className="w-full p-3 rounded-full bg-[#ffffff] text-[#323232] focus:outline-none focus:ring-2 focus:ring-[#fccc52] focus:border-transparent shadow-md" validate={[required]}>
+            <option value="" disabled>Select Status</option>
+            <option value="available">Available</option>
+            <option value="booked">Booked</option>
+          </Field>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const renderCarDetailsFields = () => (
+  <div className="mb-6 p-4 rounded-lg bg-[#ffffff] ">
+    <h4 className="text-lg font-bold mb-4 text-[#ff914d]">Car Details</h4>
+    <Field name="carDetails.details" type="text" component={renderField} label="Details" />
+    <Field name="carDetails.rentalInfo" type="text" component={renderField} label="Rental Info" />
+    <Field name="carDetails.additionalInfo" type="text" component={renderField} label="Additional Info" />
+  </div>
+);
+
+const required = (value: any) => (value ? undefined : 'This field is required');
+const number = (value: any) => (isNaN(Number(value)) ? 'Must be a number' : undefined);
+
+const CarRentalForm: React.FC<InjectedFormProps<FormValues>> = ({ handleSubmit }) => {
+  const router = useRouter();
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+    }
+  }, []);
+
+  const onSubmit = async (values: FormValues) => {
+    if (!token) {
+        toast.error("Token not found");
+        return;
+    }
+
+    const decodedToken: any = jwt.decode(token);
+    const userId = decodedToken?.id;
+    if (!userId) {
+        toast.error("Invalid token");
+        return;
+    }
+
+    const formattedValues = {
+        createdBy: userId,
+        numberOfCars: values.numberOfCars,
+        cars: values.cars.map((car) => ({
+            ...car,
+            price: parseFloat((car.price ?? 0).toString()),
+            numberOfCars: values.numberOfCars,
+        })),
+        carDetails: values.carDetails,
+    };
+
+    try {
+        await addCarRental(formattedValues, token);
+        toast.success("Car rental added successfully");
+        router.push("/car/View-Listings");
+    } catch (error) {
+        toast.error("Error adding car rental");
+    }
+};
+
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl mx-auto mt-8 p-6 bg-[#ffffff] rounded-lg  max-h-[42rem] overflow-y-scroll">
+      <Field name="numberOfCars" component={renderField} type="number" label="Number of Cars" validate={[required, number]} />
+      <FieldArray name="cars" component={renderCarFields} />
+      {renderCarDetailsFields()}
+      <div className="flex justify-end mt-6">
+        <button
+          type="submit"
+          className="bg-[#fccc52] text-[#ffffff] px-6 py-3 rounded-full font-bold text-lg shadow-md"
+        >
+          Submit
+        </button>
       </div>
     </form>
   );
 };
 
-const ConnectedMultiStepForm = reduxForm<FormValues>({
+const ConnectedCarRentalForm = reduxForm<FormValues>({
   form: 'addCarRental',
-})(MultiStepForm);
+})(CarRentalForm);
 
 const AddCarRentalPage = () => (
   <OperatorLayout>
-    <h1 className="text-3xl text-center font-bold mb-8 text-[#fccc52]">Add Car Rental</h1>
-    <ConnectedMultiStepForm />
+    <h1 className="text-3xl text-center font-bold mb-8 text-[#ff914d]">Add Car Rental</h1>
+    <ConnectedCarRentalForm />
   </OperatorLayout>
 );
 

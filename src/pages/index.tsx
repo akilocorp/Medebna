@@ -6,6 +6,8 @@ import Link from "next/link";
 import { FaRegCalendarAlt, FaHotel, FaCar, FaStar } from "react-icons/fa";
 import { getHotels } from "@/stores/admin/ApiCallerAdmin";
 import { fetchHotelOwnerProfiles } from "@/stores/operator/hotelprofileapicaller";
+import { fetchCarOwnerProfile } from "@/stores/operator/carprofileapicaller";
+import { fetchEventOwnerProfile } from "@/stores/operator/eventprofileapicaller";
 
 interface Operator {
   _id: string;
@@ -22,10 +24,43 @@ interface HotelProfile {
   rating: number;
 }
 
+interface CarOwnerProfile {
+  _id: string;
+  address: string;
+  city: string;
+  companyImage: string;
+  description: string;
+  rating: number;
+  rentalRules: {
+    rentalDuration: string;
+    cancellationPolicy: string;
+    prepayment: boolean;
+    noAgeRestriction: boolean;
+    additionalInfo: string;
+    acceptedPaymentMethods: string;
+  };
+}
+
+interface EventOwnerProfile {
+  _id: string;
+  address: string;
+  city: string;
+  companyImage: string;
+  description: string;
+  rating: number;
+  eventRules: {
+    checkIn: string;
+    checkOut: string;
+    cancellationPolicy: string;
+    additionalInfo: string;
+    acceptedPaymentMethods: string;
+  };
+}
+
 export default function Home() {
   const [operators, setOperators] = useState<Operator[]>([]);
   const [loading, setLoading] = useState(true);
-  const [profiles, setProfiles] = useState<Record<string, HotelProfile>>({});
+  const [profiles, setProfiles] = useState<Record<string, HotelProfile | CarOwnerProfile | EventOwnerProfile>>({});
 
   useEffect(() => {
     const fetchOperators = async () => {
@@ -33,13 +68,31 @@ export default function Home() {
         const operatorData = await getHotels();
         console.log("Fetched Operators:", operatorData);
         setOperators(operatorData);
-
+  
         // Fetch profiles for each operator
-        const profileData: Record<string, HotelProfile> = {};
+        const profileData: Record<string, HotelProfile | CarOwnerProfile | EventOwnerProfile> = {};
         for (const operator of operatorData) {
-          const profile = await fetchHotelOwnerProfiles(operator._id);
-          if (profile && profile.data && profile.data.hotelProfile) {
-            profileData[operator._id] = profile.data.hotelProfile;
+          let profile = null;
+  
+          if (operator.type === 'hotel') {
+            const hotelResponse = await fetchHotelOwnerProfiles(operator._id);
+            if (hotelResponse?.data?.hotelProfile) {
+              profile = hotelResponse.data.hotelProfile;
+            }
+          } else if (operator.type === 'car') {
+            const carResponse = await fetchCarOwnerProfile(operator._id);
+            if (carResponse) {
+              profile = carResponse; // Directly assign as CarOwnerProfile has no data wrapping
+            }
+          } else if (operator.type === 'event') {
+            const eventResponse = await fetchEventOwnerProfile(operator._id);
+            if (eventResponse) {
+              profile = eventResponse; // Directly assign as EventOwnerProfile has no data wrapping
+            }
+          }
+  
+          if (profile) {
+            profileData[operator._id] = profile;
           }
         }
         setProfiles(profileData);
@@ -49,16 +102,16 @@ export default function Home() {
         setLoading(false);
       }
     };
-
+  
     fetchOperators();
-
+  
     const scrollContainers = document.querySelectorAll(".scroll-container");
     const timers: NodeJS.Timeout[] = [];
-
+  
     scrollContainers.forEach((container) => {
       let scrollAmount = 0;
       const containerWidth = container.scrollWidth;
-
+  
       const slide = () => {
         container.scrollLeft += 2;
         scrollAmount += 2;
@@ -67,15 +120,16 @@ export default function Home() {
           scrollAmount = 0;
         }
       };
-
+  
       const slideTimer = setInterval(slide, 20);
       timers.push(slideTimer);
     });
-
+  
     return () => {
       timers.forEach((timer) => clearInterval(timer));
     };
   }, []);
+  
 
   const renderCards = (type: "hotel" | "event" | "car") => {
     if (!operators || operators.length === 0) {
@@ -170,8 +224,6 @@ export default function Home() {
 
   return (
     <div className="bg-[#ffffff] min-h-screen text-[#fccc52]">
-    
-
       <Header />
 
       <main className="pt-28 py-8">

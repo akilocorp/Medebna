@@ -62,7 +62,7 @@ interface Facilities {
   export const addHotelOwnerProfile = async (profileData: HotelProfileCreate): Promise<HotelProfile> => {
     const token = getToken();
     try {
-      const response = await fetch(`http://194.5.159.228:5003/hotel-owner/add-hotel-owner-profile`, {
+      const response = await fetch("http://194.5.159.228:5003/hotel-owner/add-hotel-owner-profile", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

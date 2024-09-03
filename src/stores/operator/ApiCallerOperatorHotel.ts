@@ -120,13 +120,16 @@ export const getListing = async (id: string) => {
     const data = await response.json();
     console.log("Full API Response:", data);
 
+    // Get the HotelId
+    const HotelId = data.data.hotel[0]._id;
+
     // Aggregate room types from all hotels
     const allRoomTypes = data.data.hotel.reduce((acc: RoomType[], hotel: any) => {
       return acc.concat(hotel.roomTypes);
     }, []);
 
     if (allRoomTypes.length > 0) {
-      return allRoomTypes;
+      return { roomTypes: allRoomTypes, HotelId };
     } else {
       throw new Error("No room types found for this hotel");
     }
@@ -135,6 +138,7 @@ export const getListing = async (id: string) => {
     throw error;
   }
 };
+
 
 
 

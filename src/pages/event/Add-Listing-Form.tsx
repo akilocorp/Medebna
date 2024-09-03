@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Field, reduxForm, InjectedFormProps, FieldArray } from 'redux-form';
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
 import { addEvent } from '@/stores/operator/ApiCallerOperatorEvent';
 import OperatorLayout from '@/components/operator/operatorLayout';
+import jwt from 'jsonwebtoken';
+import { CldUploadWidget } from 'next-cloudinary';
+import { RiUploadCloudFill } from 'react-icons/ri';
 
 interface EventPrice {
   type: string;
@@ -18,19 +21,7 @@ interface EventDetails {
   foodAndDrink: string;
 }
 
-interface EventRules {
-  checkIn: string;
-  checkOut: string;
-  cancellationPolicy: string;
-  prepayment: boolean;
-  noAgeRestriction: boolean;
-  pets: boolean;
-  additionalInfo: string;
-  acceptedPaymentMethods: string;
-}
-
 interface FormValues {
-  rating: string;
   location: string;
   date: string;
   startTime: string;
@@ -40,8 +31,62 @@ interface FormValues {
   status: string;
   eventPrices: EventPrice[];
   eventDetails: EventDetails;
-  eventRules: EventRules;
 }
+
+const validate = (values: FormValues) => {
+  const errors: { [key in keyof FormValues]?: any } = {};
+
+  if (!values.location) errors.location = 'Location is required';
+  if (!values.date) errors.date = 'Date is required';
+  if (!values.startTime) errors.startTime = 'Start time is required';
+  if (!values.endTime) errors.endTime = 'End time is required';
+  if (!values.image) errors.image = 'Image is required';
+  if (!values.description) errors.description = 'Description is required';
+  if (!values.status) errors.status = 'Status is required';
+
+  if (!values.eventPrices || values.eventPrices.length === 0) {
+    errors.eventPrices = 'At least one event price is required';
+  } else {
+    const eventPricesArrayErrors: any[] = [];
+    values.eventPrices.forEach((eventPrice, index) => {
+      const eventPriceErrors: { [key in keyof EventPrice]?: string } = {};
+      if (!eventPrice.type) eventPriceErrors.type = 'Ticket type is required';
+      if (eventPrice.ticketAvailable === undefined || eventPrice.ticketAvailable === null) {
+        eventPriceErrors.ticketAvailable = 'Tickets available is required';
+      } else if (eventPrice.ticketAvailable <= 0) {
+        eventPriceErrors.ticketAvailable = 'Tickets available must be greater than 0';
+      }
+      if (eventPrice.price === undefined || eventPrice.price === null) {
+        eventPriceErrors.price = 'Price is required';
+      } else if (eventPrice.price <= 0) {
+        eventPriceErrors.price = 'Price must be greater than 0';
+      }
+      if (Object.keys(eventPriceErrors).length > 0) {
+        eventPricesArrayErrors[index] = eventPriceErrors;
+      }
+    });
+    if (eventPricesArrayErrors.length > 0) {
+      errors.eventPrices = eventPricesArrayErrors;
+    }
+  }
+
+  // Ensure eventDetails is defined before accessing its properties
+  if (!values.eventDetails) {
+    errors.eventDetails = 'Event details are required';
+  } else {
+    const eventDetailsErrors: { [key in keyof EventDetails]?: string } = {};
+    if (!values.eventDetails.details) eventDetailsErrors.details = 'Details are required';
+    if (!values.eventDetails.ticketInfo) eventDetailsErrors.ticketInfo = 'Ticket info is required';
+    if (!values.eventDetails.additionalInfo) eventDetailsErrors.additionalInfo = 'Additional info is required';
+    if (!values.eventDetails.foodAndDrink) eventDetailsErrors.foodAndDrink = 'Food and drink info is required';
+    if (Object.keys(eventDetailsErrors).length > 0) {
+      errors.eventDetails = eventDetailsErrors;
+    }
+  }
+
+  return errors;
+};
+
 
 
 const renderField = ({
@@ -56,12 +101,12 @@ const renderField = ({
   meta: { touched: boolean; error?: string };
 }) => (
   <div className="mb-6">
-    <label className="block text-[#fccc52] mb-2 text-lg font-bold">{label}</label>
+    <label className="block text-[#ff914d] mb-2 text-lg font-bold">{label}</label>
     <div className="relative">
       <input
         {...input}
         type={type}
-        className="w-full p-3 rounded-full bg-[#323232] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#fccc52] focus:border-transparent shadow-md"
+        className="w-full p-3 rounded-full bg-[#ffffff] text-[#323232] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ff914d] focus:border-transparent shadow-md"
         placeholder={label}
       />
       {touched && error && <span className="text-red-500 text-sm mt-1 block">{error}</span>}
@@ -69,11 +114,77 @@ const renderField = ({
   </div>
 );
 
+const renderSelectField = ({
+  input,
+  label,
+  meta: { touched, error },
+  children,
+}: {
+  input: any;
+  label: string;
+  meta: { touched: boolean; error?: string };
+  children: React.ReactNode;
+}) => (
+  <div className="mb-6">
+    <label className="block text-[#ff914d] mb-2 text-lg font-bold">{label}</label>
+    <div className="relative">
+      <select
+        {...input}
+        className="w-full p-3 rounded-full bg-[#ffffff] text-[#323232] focus:outline-none focus:ring-2 focus:ring-[#ff914d] focus:border-transparent shadow-md"
+      >
+        {children}
+      </select>
+      {touched && error && <span className="text-red-500 text-sm mt-1 block">{error}</span>}
+    </div>
+  </div>
+);
+
+const renderImageUpload = ({ input, label }: any) => {
+  const [imageUrl, setImageUrl] = useState<string | null>(input.value);
+
+  const handleUpload = (result: any) => {
+    if (result.event === 'success') {
+      const imageUrl = result.info.secure_url;
+      input.onChange(imageUrl);
+      setImageUrl(imageUrl);
+    }
+  };
+
+  return (
+    <div className="relative mb-4">
+      <label className="block text-[#ff914d] mb-2 text-lg font-bold">{label}</label>
+      <CldUploadWidget
+        uploadPreset="u06vgrf1" // Replace with your Cloudinary upload preset
+        onSuccess={handleUpload}
+      >
+        {({ open }) => (
+          <button
+            type="button"
+            className="block w-40 p-2 py-2 rounded-full border text-[#323232] border-[#fccc52] cursor-pointer flex items-center justify-center bg-[#ffffff] shadow-md"
+            onClick={(e) => {
+              e.preventDefault();
+              open();
+            }}
+          >
+            <RiUploadCloudFill className="mr-2 text-lg text-[#ff914d]" />
+            {imageUrl ? 'Change Image' : 'Upload Image'}
+          </button>
+        )}
+      </CldUploadWidget>
+      {imageUrl && (
+        <div className="mt-4">
+          <img src={imageUrl} alt="Preview" className="w-32 h-32 rounded-lg shadow-md" />
+        </div>
+      )}
+    </div>
+  );
+};
+
 const renderEventPriceFields = ({ fields }: { fields: any }) => (
   <div>
     {fields.map((eventPrice: any, index: number) => (
       <div key={index} className="mb-6 p-4 rounded-lg">
-        <h4 className="text-lg font-bold mb-2 text-[#fccc52]">Event Price #{index + 1}</h4>
+        <h4 className="text-lg font-bold mb-2 text-[#ff914d]">Event Price #{index + 1}</h4>
         <Field name={`${eventPrice}.type`} type="text" component={renderField} label="Ticket Type" />
         <Field name={`${eventPrice}.ticketAvailable`} type="number" component={renderField} label="Tickets Available" />
         <Field name={`${eventPrice}.price`} type="number" component={renderField} label="Price" />
@@ -98,7 +209,7 @@ const renderEventPriceFields = ({ fields }: { fields: any }) => (
 
 const renderEventDetailsFields = () => (
   <div className="mb-6 p-4 rounded-lg">
-    <h4 className="text-lg font-bold mb-4 text-white">Event Details</h4>
+    <h4 className="text-lg font-bold mb-4 text-[#ff914d]">Event Details</h4>
     <Field name="eventDetails.details" type="text" component={renderField} label="Details" />
     <Field name="eventDetails.ticketInfo" type="text" component={renderField} label="Ticket Info" />
     <Field name="eventDetails.additionalInfo" type="text" component={renderField} label="Additional Info" />
@@ -106,129 +217,91 @@ const renderEventDetailsFields = () => (
   </div>
 );
 
-const renderEventRulesFields = () => (
-  <div className="mb-6 p-4 rounded-lg">
-    <h4 className="text-lg font-bold mb-4 text-white">Event Rules</h4>
-    <Field name="eventRules.checkIn" type="text" component={renderField} label="Check-In Time" />
-    <Field name="eventRules.checkOut" type="text" component={renderField} label="Check-Out Time" />
-    <Field name="eventRules.cancellationPolicy" type="text" component={renderField} label="Cancellation Policy" />
-    <div className="flex items-center mb-4">
-      <Field name="eventRules.prepayment" type="checkbox" component="input" />
-      <label className="ml-2 text-[#fccc52]">Prepayment Required</label>
-    </div>
-    <div className="flex items-center mb-4">
-      <Field name="eventRules.noAgeRestriction" type="checkbox" component="input" />
-      <label className="ml-2 text-[#fccc52]">No Age Restriction</label>
-    </div>
-    <div className="flex items-center mb-4">
-      <Field name="eventRules.pets" type="checkbox" component="input" />
-      <label className="ml-2 text-[#fccc52]">Pets Allowed</label>
-    </div>
-    <Field name="eventRules.additionalInfo" type="text" component={renderField} label="Additional Info" />
-    <Field name="eventRules.acceptedPaymentMethods" type="text" component={renderField} label="Accepted Payment Methods" />
-  </div>
-);
-
 const AddEventForm: React.FC<InjectedFormProps<FormValues>> = ({ handleSubmit }) => {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [token, setToken] = useState<string | null>(null);
 
-  const nextStep = () => setCurrentStep(currentStep + 1);
-  const previousStep = () => setCurrentStep(currentStep - 1);
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+    }
+  }, []);
 
   const onSubmit = async (values: FormValues) => {
+    if (!token) {
+      toast.error("Token not found");
+      return;
+    }
+
+    const decodedToken: any = jwt.decode(token);
+    const userId = decodedToken?.id;
+    if (!userId) {
+      toast.error("Invalid token");
+      return;
+    }
+
+    // Reformatting the values to match the desired structure
     const formattedValues = {
-      ...values,
-      rating: parseFloat(values.rating),
+      events: {
+        location: values.location,
+        date: values.date,
+        startTime: values.startTime,
+        endTime: values.endTime,
+        image: values.image,
+        description: values.description,
+        status: values.status,
+      },
       eventPrices: (values.eventPrices || []).map((price) => ({
         ...price,
         price: parseFloat(price.price.toString()),
         ticketAvailable: parseInt(price.ticketAvailable.toString(), 10),
       })),
+      eventDetails: {
+        details: values.eventDetails.details,
+        ticketInfo: values.eventDetails.ticketInfo,
+        additionalInfo: values.eventDetails.additionalInfo,
+        foodAndDrink: values.eventDetails.foodAndDrink,
+      },
     };
-  
+    console.log("Form Data:", formattedValues);
+    
     try {
-      await addEvent(formattedValues);
+      await addEvent(formattedValues, token);
       toast.success("Event added successfully");
-      router.push("/operator/view-events");
+      router.push("/event/View-Listings");
     } catch (error) {
       toast.error("Error adding event");
     }
   };
-  
 
-  const renderStep = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <>
-            <Field name="rating" component={renderField} type="number" label="Rating" />
-            <Field name="location" component={renderField} type="text" label="Location" />
-            <Field name="date" component={renderField} type="date" label="Date" />
-            <Field name="startTime" component={renderField} type="time" label="Start Time" />
-          </>
-        );
-      case 2:
-        return (
-          <>
-            <Field name="endTime" component={renderField} type="time" label="End Time" />
-            <Field name="image" component={renderField} type="text" label="Image URL" />
-            <Field name="description" component={renderField} type="text" label="Description" />
-            <Field name="status" component={renderField} type="text" label="Status" />
-          </>
-        );
-      case 3:
-        return (
-          <div className="overflow-y-auto max-h-96">
-            <FieldArray name="eventPrices" component={renderEventPriceFields} />
-          </div>
-        );
-      case 4:
-        return (
-          <div className="overflow-y-auto max-h-96">
-            {renderEventDetailsFields()}
-          </div>
-        );
-      case 5:
-        return (
-          <div className="overflow-y-auto max-h-96">
-            {renderEventRulesFields()}
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl mx-auto mt-8 p-6 bg-[#1a1a1a] rounded-lg shadow-lg">
-      {renderStep()}
-      <div className="flex justify-between mt-6">
-        {currentStep > 1 && (
-          <button
-            type="button"
-            onClick={previousStep}
-            className="bg-[#fccc52] text-[#323232] px-6 py-3 rounded-full font-bold text-lg shadow-md"
-          >
-            Previous
-          </button>
-        )}
-        {currentStep < 5 ? (
-          <button
-            type="button"
-            onClick={nextStep}
-            className="bg-[#fccc52] text-[#323232] px-6 py-3 rounded-full font-bold text-lg shadow-md"
-          >
-            Next
-          </button>
-        ) : (
-          <button
-            type="submit"
-            className="bg-[#fccc52] text-[#323232] px-6 py-3 rounded-full font-bold text-lg shadow-md"
-          >
-            Submit
-          </button>
-        )}
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="max-w-2xl mx-auto mt-8 p-6 bg-[#ffffff] rounded-lg shadow-lg max-h-[42rem] overflow-y-scroll"
+    >
+    
+      <Field name="location" component={renderField} type="text" label="Location" />
+      <Field name="date" component={renderField} type="date" label="Date" />
+      <Field name="startTime" component={renderField} type="time" label="Start Time" />
+      <Field name="endTime" component={renderField} type="time" label="End Time" />
+      <Field name="image" component={renderImageUpload} label="Image URL" />
+      <Field name="description" component={renderField} type="text" label="Description" />
+      <Field name="status" component={renderSelectField} label="Status">
+        <option value="">Select Status</option>
+        <option value="available">Available</option>
+        <option value="booked">Booked</option>
+      </Field>
+      <FieldArray name="eventPrices" component={renderEventPriceFields} />
+      {renderEventDetailsFields()}
+      <div className="flex justify-end mt-6">
+        <button
+          type="submit"
+          className="bg-[#ff914d] text-[#ffffff] px-6 py-3 rounded-full font-bold text-lg shadow-md"
+        >
+          Submit
+        </button>
       </div>
     </form>
   );
@@ -236,11 +309,13 @@ const AddEventForm: React.FC<InjectedFormProps<FormValues>> = ({ handleSubmit })
 
 const ConnectedAddEventForm = reduxForm<FormValues>({
   form: 'addEvent',
+  validate, // Add the validate function here
 })(AddEventForm);
+
 
 const AddEventPage = () => (
   <OperatorLayout>
-    <h1 className="text-3xl text-center font-bold mb-8 text-[#fccc52]">Add Event</h1>
+    <h1 className="text-3xl text-center font-bold mb-8 text-[#ff914d]">Add Event</h1>
     <ConnectedAddEventForm />
   </OperatorLayout>
 );

@@ -4,39 +4,88 @@ import { useRouter } from 'next/router';
 import { ReactElement, useState, useEffect } from 'react';
 import { FaCar, FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import { IoChevronBack } from 'react-icons/io5';
+import { fetchCarOwnerProfile } from '@/stores/operator/carprofileapicaller'; 
+import { getHotels } from '@/stores/admin/ApiCallerAdmin'; 
 
 interface CarRental {
-  id: number;
+  id: string;
   name: string;
-  description: string;
-  image: string;
+  description?: string;
+  image?: string;
   icon: ReactElement;
-  rating: number;
+  city: string;
+  rating?: number;
+  address?: string;
 }
 
 export default function ChooseCarRental() {
-  const [selectedCarRental, setSelectedCarRental] = useState<CarRental | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
+  const [carRentals, setCarRentals] = useState<CarRental[]>([]);
+  const [filteredCarRentals, setFilteredCarRentals] = useState<CarRental[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    setIsMounted(true);
+    const fetchCarRentals = async () => {
+      try {
+        const operators = await getHotels(); // Fetch car rental operators
+        const carRentalPromises = operators
+          .filter((operator) => operator.type === 'car') 
+          .map(async (carOperator) => {
+            const profile = await fetchCarOwnerProfile(carOperator._id);
+            if (profile) {
+              return {
+                id: carOperator._id,
+                name: carOperator.name,
+                description: profile.description || 'No description available.',
+                image: profile.companyImage || '/assets/default-car.png',
+                icon: <FaCar />,
+                rating: profile.rating || 0,
+                address: profile.address || 'Address not available',
+                city: profile.city || 'City not available',
+              };
+            }
+            return {
+              id: carOperator._id,
+              name: carOperator.name,
+              description: 'No description available.',
+              image: '/assets/default-car.png',
+              icon: <FaCar />,
+              rating: 0,
+              address: 'Address not available',
+              city: 'City not available',
+            };
+          });
+
+        const carRentals = await Promise.all(carRentalPromises);
+        setCarRentals(carRentals.filter(e => e !== null));
+        setFilteredCarRentals(carRentals.filter(e => e !== null));
+      } catch (error) {
+        console.error('Error fetching car rentals:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCarRentals();
   }, []);
 
-  const carRentals: CarRental[] = [
-    { id: 1, name: 'Avis Car Rental', description: 'Reliable cars for your journey.', image: '/assets/carrental.png', icon: <FaCar />, rating: 5 },
-    { id: 2, name: 'Hertz Car Rental', description: 'Experience the best cars in town.', image: '/assets/carrental.png', icon: <FaCar />, rating: 4 },
-    { id: 3, name: 'Enterprise', description: 'Elegance and comfort combined.', image: '/assets/carrental.png', icon: <FaCar />, rating: 3 },
-    { id: 4, name: 'Budget Car Rental', description: 'Affordable and reliable.', image: '/assets/carrental.png', icon: <FaCar />, rating: 4.5 },
-    { id: 5, name: 'National Car Rental', description: 'A peaceful retreat in the mountains.', image: '/assets/carrental.png', icon: <FaCar />, rating: 2 },
-    { id: 6, name: 'Alamo Rent A Car', description: 'Great cars at great prices.', image: '/assets/carrental.png', icon: <FaCar />, rating: 4.5 }
-  ];
+  useEffect(() => {
+    const results = carRentals.filter(carRental =>
+      carRental.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      carRental.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      carRental.address?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredCarRentals(results);
+  }, [searchTerm, carRentals]);
 
   const handleCarRentalClick = (carRental: CarRental) => {
-    setSelectedCarRental(carRental);
     router.push({
-      pathname: '/cars/details',
-      query: { carRentalId: carRental.id, carRentalName: carRental.name, carRentalDescription: carRental.description, carRentalImage: carRental.image }
+      pathname: '/cars/details', // The path to your ChooseCar page
+      query: {
+        carId: carRental.id,      // Pass the car rental ID
+        rentalName: carRental.name,  // Pass the car rental name
+      },
     });
   };
 
@@ -54,13 +103,40 @@ export default function ChooseCarRental() {
     return stars;
   };
 
-  if (!isMounted) {
-    return null;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#f9f9f9]">
+        <div className="text-center">
+          <div className="flex justify-center mb-4">
+            <svg
+              className="animate-spin h-10 w-10 text-[#ff914d]"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
+            </svg>
+          </div>
+          <p className="text-[#fccc52] text-lg font-semibold">Loading, please wait...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="bg-[#ffffff] min-h-screen text-[#323232] relative">
-      
       <div className="p-4">
         <Link href="/" legacyBehavior>
           <a className="inline-flex items-center bg-gradient-to-r from-[#fccc52] to-[#ff914d] text-[#323232] mb-8 px-4 py-2 bg-opacity-90 rounded-lg hover:bg-[#fccc52] hover:text-[#ffffff] transition-colors duration-300">
@@ -69,7 +145,6 @@ export default function ChooseCarRental() {
         </Link>
       </div>
 
-      {/* Cart Icon positioned at the top right */}
       <div className="absolute top-4 right-4">
         <CartIcon />
       </div>
@@ -82,6 +157,8 @@ export default function ChooseCarRental() {
               <input
                 type="text"
                 placeholder="Search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="flex w-full sm:w-1/2 px-4 py-2 rounded-full bg-gray-100 border-2 border-[#fccc52] shadow-lg text-[#323232] mb-2 sm:mb-0 focus:outline-none focus:border-[#ff914d] hover:border-[#ff914d]"
               />
               <button className="sm:ml-4 px-4 py-2 bg-gradient-to-r from-[#fccc52] to-[#ff914d] font-md drop-shadow-md text-[#323232] rounded-lg transition-colors duration-300">
@@ -106,7 +183,7 @@ export default function ChooseCarRental() {
         <div className="flex justify-center items-center p-8">
           <div className="w-full max-w-6xl flex flex-col items-center p-4 mx-auto">
             <div className="flex flex-wrap justify-between gap-8">
-              {carRentals.map((carRental) => (
+              {filteredCarRentals.map((carRental) => (
                 <div
                   key={carRental.id}
                   className="w-[320px] md:w-[350px] bg-[#ff914d] bg-opacity-5 rounded-3xl shadow-lg flex-shrink-0 transform transition duration-500 hover:scale-105 hover:shadow-2xl flex flex-col overflow-hidden cursor-pointer"
@@ -125,9 +202,9 @@ export default function ChooseCarRental() {
                         {carRental.name}
                       </h3>
                       <p className="text-left mb-2 text-sm text-gray-600 drop-shadow-md">
-                        {carRental.description}
+                        {carRental.city}, {carRental.address ?? 'Address not available'}
                       </p>
-                      <div className="flex mb-2">{renderStars(carRental.rating)}</div>
+                      <div className="flex mb-2">{renderStars(carRental.rating ?? 0)}</div>
                     </div>
                     <div className="text-3xl text-[#fccc52]">
                       {carRental.icon}
@@ -136,13 +213,7 @@ export default function ChooseCarRental() {
                 </div>
               ))}
             </div>
-            {selectedCarRental && (
-              <div className="mt-8 text-center">
-                <h2 className="text-3xl font-bold mb-4 text-[#fccc52]">{selectedCarRental.name}</h2>
-                <p className="mb-4">{selectedCarRental.description}</p>
-                <button className="bg-[#fccc52] text-[#323232] px-6 py-2 mt-4 rounded-lg">Book Now</button>
-              </div>
-            )}
+            
           </div>
         </div>
       </main>

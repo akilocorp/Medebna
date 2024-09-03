@@ -1,11 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface EventPrice {
-  type: string;
-  ticketAvailable: number;
-  price: number;
-}
-
 interface EventDetails {
   details: string;
   ticketInfo: string;
@@ -13,19 +7,13 @@ interface EventDetails {
   foodAndDrink: string;
 }
 
-interface EventRules {
-  checkIn: string;
-  checkOut: string;
-  cancellationPolicy: string;
-  prepayment: boolean;
-  noAgeRestriction: boolean;
-  pets: boolean;
-  additionalInfo: string;
-  acceptedPaymentMethods: string;
+interface EventPrice {
+  type: string;
+  ticketAvailable: number;
+  price: number;
 }
 
-export interface Event {
-  rating: number;
+interface EventData {
   location: string;
   date: string;
   startTime: string;
@@ -33,10 +21,13 @@ export interface Event {
   image: string;
   description: string;
   status: string;
+}
+
+export interface Event {
+  events: EventData;
   eventPrices: EventPrice[];
   eventDetails: EventDetails;
-  eventRules: EventRules;
-  id?: string;
+  _id?: string; // Assuming this is the unique identifier for the event
 }
 
 interface EventState {
@@ -46,6 +37,7 @@ interface EventState {
 const initialState: EventState = {
   events: [],
 };
+
 
 const eventSlice = createSlice({
   name: 'event',
@@ -57,11 +49,18 @@ const eventSlice = createSlice({
     addEvent: (state, action: PayloadAction<Event>) => {
       state.events.push(action.payload);
     },
+    updateEvent: (state, action: PayloadAction<{ id: string; event: Event }>) => {
+      const index = state.events.findIndex(event => event._id === action.payload.id);
+      if (index !== -1) {
+        state.events[index] = action.payload.event;
+      }
+    },
     deleteEvent: (state, action: PayloadAction<string>) => {
-      state.events = state.events.filter(event => event.id !== action.payload);
+      state.events = state.events.filter(event => event._id !== action.payload);
     },
   },
 });
 
-export const { setEvents, addEvent, deleteEvent } = eventSlice.actions;
+export const { setEvents, addEvent, updateEvent, deleteEvent } = eventSlice.actions;
 export default eventSlice.reducer;
+

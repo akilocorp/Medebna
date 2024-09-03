@@ -14,8 +14,8 @@ import { useSwipeable } from 'react-swipeable';
 import CartIcon from '@/components/carticon';
 import { getListing } from '@/stores/operator/ApiCallerOperatorHotel';
 import { fetchHotelOwnerProfiles } from '@/stores/operator/hotelprofileapicaller';
+import { addToCart, getCartCount } from '@/stores/cart/carapicaller'; // Make sure the path is correct
 import { FaBed, FaUtensils, FaSwimmingPool, FaWifi, FaShower, FaParking, FaAccessibleIcon, FaSpa, FaLanguage, FaBriefcase } from 'react-icons/fa';
-
 interface Facilities {
   popularFacilities: string[];
   roomAmenities: string[];
@@ -51,7 +51,7 @@ interface HouseRules {
 }
 
 interface Room {
-  id: string;
+  _id: string;
   roomNumber: string;
   status: string;
 }
@@ -155,6 +155,9 @@ export default function ChooseRoom() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isMounted, setIsMounted] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [HotelId, setHotelId] = useState<string | null>(null);
+
+
 
   useEffect(() => {
     setIsMounted(true);
@@ -168,10 +171,11 @@ export default function ChooseRoom() {
   const fetchListingData = async (id: string) => {
     setLoading(true);
     try {
-      const roomTypes = await getListing(id);
+      const { roomTypes, HotelId } = await getListing(id); // Destructure to get both roomTypes and HotelId
       if (roomTypes && roomTypes.length > 0) {
         setRooms(roomTypes);
         setFilteredRooms(roomTypes);
+        setHotelId(HotelId); // Store the HotelId in state
       } else {
         console.error('No room types found for this hotel');
       }
@@ -181,6 +185,8 @@ export default function ChooseRoom() {
       setLoading(false);
     }
   };
+  
+  
 
   const fetchHotelProfileData = async (id: string) => {
     setLoading(true);
@@ -220,25 +226,32 @@ export default function ChooseRoom() {
     setValue(newValue);
   };
 
-  const handleAddToCart = () => {
-    if (numRooms < 1) {
-      alert('Please enter a valid number of rooms.');
+  const handleAddToCart = async () => {
+    if (!selectedRoom || !roomNumber || !HotelId) {
+      alert('Please select a room, room number, and ensure the HotelId is available.');
       return;
     }
-
-    if (numGuests < 1) {
-      alert('Please enter a valid number of guests.');
+  
+    // Extract the roomId from the selected room based on the roomNumber
+    const selectedRoomObject = selectedRoom.rooms.find(room => room.roomNumber === roomNumber);
+    if (!selectedRoomObject) {
+      alert('Invalid room selection. Please try again.');
       return;
     }
-
-    if (!roomNumber) {
-      alert('Please select a room number.');
-      return;
+  
+    try {
+      const response = await addToCart(HotelId, 'hotel', selectedRoomObject._id);
+      if (response) {
+        alert('Room added to cart successfully.');
+        setIsModalOpen(false); // Close the modal after adding to the cart
+        window.location.reload(); // Refresh the page
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert('Failed to add room to cart. Please try again.');
     }
-
-    setIsModalOpen(false);
-    console.log('Room added to cart');
   };
+ 
 
   const handlers = useSwipeable({
     onSwipedLeft: () => setValue((prev) => Math.min(prev + 1, 2)),
@@ -280,7 +293,6 @@ export default function ChooseRoom() {
       </div>
     );
   }
-
   return (
     <div className="bg-[#ffffff] min-h-screen text-[#000000]" {...handlers}>
       <AppBar position="static" style={{ backgroundColor: '#ffffff' }}>
@@ -393,30 +405,6 @@ export default function ChooseRoom() {
                   <h2 className="text-2xl drop-shadow-md font-bold text-[#fccc52] mb-4">{selectedRoom.type}</h2>
                   <p className="mb-2 drop-shadow-md">{selectedRoom.description}</p>
                   <p className="mb-4 drop-shadow-md">${selectedRoom.price} per night</p>
-
-                  <div className="mb-4 text-[#fccc52]">
-                    <label className="block text-sm mb-2 drop-shadow-md">Number of Rooms</label>
-                    <input
-                      type="number"
-                      value={numRooms}
-                      onChange={(e) => setNumRooms(Number(e.target.value))}
-                      className="rounded-full bg-gray-100 border-2 border-[#fccc52] shadow-lg text-[#323232] px-4 py-2 focus:outline-none focus:border-[#ff914d] hover:border-[#ff914d]"
-                      required
-                      min="1"
-                    />
-                  </div>
-
-                  <div className="mb-4 text-[#fccc52]">
-                    <label className="block text-sm mb-2">Number of Guests</label>
-                    <input
-                      type="number"
-                      value={numGuests}
-                      onChange={(e) => setNumGuests(Number(e.target.value))}
-                      className="rounded-full bg-gray-100 border-2 border-[#fccc52] shadow-lg text-[#323232] px-4 py-2 focus:outline-none focus:border-[#ff914d] hover:border-[#ff914d]"
-                      required
-                      min="1"
-                    />
-                  </div>
 
                   <div className="mb-4 text-[#fccc52]">
                     <label className="block text-sm drop-shadow-md mb-2">Room Number</label>

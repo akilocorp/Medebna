@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Car {
-  numberOfCars: number;
   type: string;
   price: number;
   image: string;
@@ -13,23 +12,12 @@ interface CarDetails {
   details: string;
   rentalInfo: string;
   additionalInfo: string;
-  language: string;
-}
-
-interface RentalRules {
-  rentalDuration: string;
-  cancellationPolicy: string;
-  prepayment: boolean;
-  noAgeRestriction: boolean;
-  additionalInfo: string;
-  acceptedPaymentMethods: string;
 }
 
 export interface CarRental {
-  rating: number;
   cars: Car[];
   carDetails: CarDetails;
-  rentalRules: RentalRules;
+  numberOfCars: number;
   id?: string;
 }
 
@@ -51,11 +39,17 @@ const carRentalSlice = createSlice({
     addCarRental: (state, action: PayloadAction<CarRental>) => {
       state.carRentals.push(action.payload);
     },
+    updateCarRental: (state, action: PayloadAction<{ id: string; carRental: CarRental }>) => {
+      const index = state.carRentals.findIndex(carRental => carRental.id === action.payload.id);
+      if (index !== -1) {
+        state.carRentals[index] = action.payload.carRental;
+      }
+    },
     deleteCarRental: (state, action: PayloadAction<string>) => {
       state.carRentals = state.carRentals.filter(carRental => carRental.id !== action.payload);
     },
   },
 });
 
-export const { setCarRentals, addCarRental, deleteCarRental } = carRentalSlice.actions;
+export const { setCarRentals, addCarRental, updateCarRental, deleteCarRental } = carRentalSlice.actions;
 export default carRentalSlice.reducer;
