@@ -139,7 +139,7 @@ const renderSelectField = ({
   </div>
 );
 
-const renderImageUpload = ({ input, label }: any) => {
+const RenderImageUpload = ({ input, label }: any) => {
   const [imageUrl, setImageUrl] = useState<string | null>(input.value);
 
   const handleUpload = (result: any) => {
@@ -286,7 +286,7 @@ const AddEventForm: React.FC<InjectedFormProps<FormValues>> = ({ handleSubmit })
       <Field name="date" component={renderField} type="date" label="Date" />
       <Field name="startTime" component={renderField} type="time" label="Start Time" />
       <Field name="endTime" component={renderField} type="time" label="End Time" />
-      <Field name="image" component={renderImageUpload} label="Image URL" />
+      <Field name="image" component={RenderImageUpload} label="Image URL" />
       <Field name="description" component={renderField} type="text" label="Description" />
       <Field name="status" component={renderSelectField} label="Status">
         <option value="">Select Status</option>

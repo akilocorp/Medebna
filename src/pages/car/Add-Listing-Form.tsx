@@ -53,7 +53,7 @@ const renderField = ({
   </div>
 );
 
-const renderImageUpload = ({ input, label }: any) => {
+const RenderImageUpload = ({ input, label }: any) => {
   const [imageUrl, setImageUrl] = useState<string | null>(input.value);
 
   const handleUpload = (result: any) => {
@@ -94,7 +94,7 @@ const renderImageUpload = ({ input, label }: any) => {
   );
 };
 
-const renderCarFields = ({ fields }: { fields: any }) => {
+const RenderCarFields = ({ fields }: { fields: any }) => {
   useEffect(() => {
     if (fields.length === 0) {
       fields.push({});
@@ -108,7 +108,7 @@ const renderCarFields = ({ fields }: { fields: any }) => {
           <h4 className="text-lg font-bold mb-2 text-[#ff914d]">Car #{index + 1}</h4>
           <Field name={`${car}.type`} type="text" component={renderField} label="Car Type" validate={[required]} />
           <Field name={`${car}.price`} type="number" component={renderField} label="Price" validate={[required, number]} />
-          <Field name={`${car}.image`} component={renderImageUpload} label="Image URL" />
+          <Field name={`${car}.image`} component={RenderImageUpload} label="Image URL" />
           <Field name={`${car}.description`} type="text" component={renderField} label="Description" validate={[required]} />
           <Field name={`${car}.status`} component="select" className="w-full p-3 rounded-full bg-[#ffffff] text-[#323232] focus:outline-none focus:ring-2 focus:ring-[#fccc52] focus:border-transparent shadow-md" validate={[required]}>
             <option value="" disabled>Select Status</option>
@@ -181,7 +181,7 @@ const CarRentalForm: React.FC<InjectedFormProps<FormValues>> = ({ handleSubmit }
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl mx-auto mt-8 p-6 bg-[#ffffff] rounded-lg  max-h-[42rem] overflow-y-scroll">
       <Field name="numberOfCars" component={renderField} type="number" label="Number of Cars" validate={[required, number]} />
-      <FieldArray name="cars" component={renderCarFields} />
+      <FieldArray name="cars" component={RenderCarFields} />
       {renderCarDetailsFields()}
       <div className="flex justify-end mt-6">
         <button
