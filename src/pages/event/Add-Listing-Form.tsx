@@ -12,6 +12,7 @@ interface EventPrice {
   type: string;
   ticketAvailable: number;
   price: number;
+  status: string;
 }
 
 interface EventDetails {
@@ -28,7 +29,6 @@ interface FormValues {
   endTime: string;
   image: string;
   description: string;
-  status: string;
   eventPrices: EventPrice[];
   eventDetails: EventDetails;
 }
@@ -42,7 +42,7 @@ const validate = (values: FormValues) => {
   if (!values.endTime) errors.endTime = 'End time is required';
   if (!values.image) errors.image = 'Image is required';
   if (!values.description) errors.description = 'Description is required';
-  if (!values.status) errors.status = 'Status is required';
+
 
   if (!values.eventPrices || values.eventPrices.length === 0) {
     errors.eventPrices = 'At least one event price is required';
@@ -56,6 +56,7 @@ const validate = (values: FormValues) => {
       } else if (eventPrice.ticketAvailable <= 0) {
         eventPriceErrors.ticketAvailable = 'Tickets available must be greater than 0';
       }
+      if (!eventPrice.status) eventPriceErrors.status = 'Status is required';
       if (eventPrice.price === undefined || eventPrice.price === null) {
         eventPriceErrors.price = 'Price is required';
       } else if (eventPrice.price <= 0) {
@@ -188,6 +189,18 @@ const renderEventPriceFields = ({ fields }: { fields: any }) => (
         <Field name={`${eventPrice}.type`} type="text" component={renderField} label="Ticket Type" />
         <Field name={`${eventPrice}.ticketAvailable`} type="number" component={renderField} label="Tickets Available" />
         <Field name={`${eventPrice}.price`} type="number" component={renderField} label="Price" />
+        
+        {/* Add status field */}
+        <Field
+          name={`${eventPrice}.status`}
+          component={renderSelectField}
+          label="Status"
+        >
+          <option value="">Select Status</option>
+          <option value="available">Available</option>
+          <option value="booked">Booked</option>
+        </Field>
+
         <button
           type="button"
           onClick={() => fields.remove(index)}
@@ -206,6 +219,7 @@ const renderEventPriceFields = ({ fields }: { fields: any }) => (
     </button>
   </div>
 );
+
 
 const renderEventDetailsFields = () => (
   <div className="mb-6 p-4 rounded-lg">
@@ -250,12 +264,13 @@ const AddEventForm: React.FC<InjectedFormProps<FormValues>> = ({ handleSubmit })
         endTime: values.endTime,
         image: values.image,
         description: values.description,
-        status: values.status,
+       
       },
       eventPrices: (values.eventPrices || []).map((price) => ({
         ...price,
         price: parseFloat(price.price.toString()),
         ticketAvailable: parseInt(price.ticketAvailable.toString(), 10),
+        status: price.status,
       })),
       eventDetails: {
         details: values.eventDetails.details,
@@ -288,11 +303,7 @@ const AddEventForm: React.FC<InjectedFormProps<FormValues>> = ({ handleSubmit })
       <Field name="endTime" component={renderField} type="time" label="End Time" />
       <Field name="image" component={RenderImageUpload} label="Image URL" />
       <Field name="description" component={renderField} type="text" label="Description" />
-      <Field name="status" component={renderSelectField} label="Status">
-        <option value="">Select Status</option>
-        <option value="available">Available</option>
-        <option value="booked">Booked</option>
-      </Field>
+     
       <FieldArray name="eventPrices" component={renderEventPriceFields} />
       {renderEventDetailsFields()}
       <div className="flex justify-end mt-6">

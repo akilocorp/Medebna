@@ -42,10 +42,8 @@ const OperatorSidebar = () => {
   return (
     <div className="w-64 h-screen bg-[#ffffff] text-black flex flex-col rounded-r-2xl justify-between shadow-lg">
       <div>
-        <h2 className="text-2xl text-center drop-shadow-md font-bold p-4 mb-4 text-[#3f3f3f] rounded-lg">
-          Operator Panel
-        </h2>
-        <div className="p-3">
+       
+        <div className="p-3 mt-2">
           <Link href="/">
             <div className="flex items-center p-4 bg-gradient-to-r from-[#ff914d] to-[#fccc52] rounded-3xl shadow-lg">
               <div className="p-2 bg-white rounded-full">
@@ -54,7 +52,7 @@ const OperatorSidebar = () => {
               <div className="ml-4">
                 <p
                   className={`text-white drop-shadow-md font-md ${
-                    userName && userName.length > 15 ? "text-sm" : "text-lg"
+                    userName && userName.length > 12 ? "text-sm" : "text-lg"
                   }`}
                 >
                   {userName || "Operator"}
@@ -111,12 +109,12 @@ const OperatorSidebar = () => {
           />
         </div>
         <p className={`text-center text-black drop-shadow-md font-bold ${
-                    userName && userName.length > 14 ? "text-xs" : "text-lg"
+                    userName && userName.length > 12 ? "text-xs" : "text-lg"
                   }`}>
           👋 Welcome, {userName || "Operator"}
         </p>
       </div>
-      <div className="mt-2 w-full">
+      <div className="w-full">
         <Link href="/" legacyBehavior>
           <a className="text-black hover:text-[#ff194d] drop-shadow-md font-md px-4 py-2 rounded flex items-center transition-colors duration-300">
             <FiLogOut className="mr-2 drop-shadow-md font-md" /> Logout

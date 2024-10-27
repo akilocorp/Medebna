@@ -11,6 +11,7 @@ interface EventPrice {
   type: string;
   ticketAvailable: number;
   price: number;
+  status: string;
 }
 
 interface EventData {
@@ -20,7 +21,7 @@ interface EventData {
   endTime: string;
   image: string;
   description: string;
-  status: string;
+  
 }
 
 export interface Event {

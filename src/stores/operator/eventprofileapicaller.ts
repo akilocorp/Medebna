@@ -57,7 +57,7 @@ export const addEventOwnerProfile = async (profileData: EventOwnerProfileCreate)
   const token = getToken();
 
   try {
-    const response = await fetch("http://194.5.159.228:5003/event-owner/add-event-owner-profile", {
+    const response = await fetch("http://147.79.100.108:5000/event-owner/add-event-owner-profile", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export const addEventOwnerProfile = async (profileData: EventOwnerProfileCreate)
 export const fetchEventOwnerProfile = async (id: string): Promise<EventOwnerProfile | null> => {
   const token = getToken();
   try {
-    const response = await fetch(`http://194.5.159.228:5003/event-owner/event-owner-detail/${id}`, {
+    const response = await fetch(`http://147.79.100.108:5000/event-owner/event-owner-detail/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ export const fetchEventOwnerProfile = async (id: string): Promise<EventOwnerProf
 };
 export const fetchEventOwnerProfiles = async (id: string) => {
   try {
-    const response = await fetch(`http://194.5.159.228:5003/event-profile/${id}`);
+    const response = await fetch(`http://147.79.100.108:5000/event-profile/${id}`);
     
     if (!response.ok) {
       const errorMessage = await response.text();
@@ -129,7 +129,7 @@ export const fetchEventOwnerProfiles = async (id: string) => {
 export const updateEventOwnerProfile = async (id: string, profileData: EventOwnerProfile): Promise<EventOwnerProfile> => {
   const token = getToken();
   try {
-    const response = await fetch(`http://194.5.159.228:5003/event-owner/update-event-owner-profile/${id}`, {
+    const response = await fetch(`http://147.79.100.108:5000/event-owner/update-event-owner-profile/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

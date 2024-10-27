@@ -6,7 +6,7 @@ export type SignInFormData = {
 
 export const signIn = async (formData: SignInFormData) => {
   try {
-    const response = await fetch("http://194.5.159.228:5003/login", {
+    const response = await fetch("http://147.79.100.108:5000/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

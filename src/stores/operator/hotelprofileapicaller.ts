@@ -62,7 +62,7 @@ interface Facilities {
   export const addHotelOwnerProfile = async (profileData: HotelProfileCreate): Promise<HotelProfile> => {
     const token = getToken();
     try {
-      const response = await fetch("http://194.5.159.228:5003/hotel-owner/add-hotel-owner-profile", {
+      const response = await fetch("http://147.79.100.108:5000/hotel-owner/add-hotel-owner-profile", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ interface Facilities {
     try {
       console.log("Fetching profile with ID:", id); // Log the ID being used
     
-      const response = await fetch(`http://194.5.159.228:5003/hotel-owner/hotel-owner-detail/${id}`, {
+      const response = await fetch(`http://147.79.100.108:5000/hotel-owner/hotel-owner-detail/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ interface Facilities {
     try {
       console.log("Fetching profile with ID:", id); // Log the ID being used
     
-      const response = await fetch(`http://194.5.159.228:5003/hotel-owner/hotel-owner-detail/${id}`, {
+      const response = await fetch(`http://147.79.100.108:5000/hotel-owner/hotel-owner-detail/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ interface Facilities {
   export const updateHotelOwnerProfile = async (id: string, profileData: HotelProfile) => {
     const token = getToken();
     try {
-      const response = await fetch(`http://194.5.159.228:5003/hotel-owner/update-hotel-owner-profile/${id}`, {
+      const response = await fetch(`http://147.79.100.108:5000/hotel-owner/update-hotel-owner-profile/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

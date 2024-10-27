@@ -6,6 +6,8 @@ import { IoChevronBack } from 'react-icons/io5';
 import CartIcon from '@/components/carticon';
 import { fetchEventOwnerProfile } from '@/stores/operator/eventprofileapicaller';
 import { getHotels } from '@/stores/admin/ApiCallerAdmin';
+import dynamic from 'next/dynamic';
+const Map = dynamic(() => import('@/components/map'), { ssr: false });
 
 interface EventCompany {
   id: string;
@@ -160,6 +162,7 @@ export default function ChooseEventCompany() {
             </p>
           </div>
           <div className="mt-4 lg:mt-0 flex items-center justify-end lg:absolute lg:top-0 lg:right-0 lg:w-1/2 h-64 lg:h-full rounded-lg overflow-hidden">
+          <Map center={[51.505, -0.09]} zoom={13} />
             <img
               src="/assets/eventt.png"
               alt="Event Planning"

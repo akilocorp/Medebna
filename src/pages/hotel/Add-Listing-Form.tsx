@@ -278,13 +278,7 @@ const AddHotelPage: React.FC = () => {
                 Add Room
               </button>
             </div>
-            <button
-              type="button"
-              onClick={() => handleRemoveRoomType(index)}
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded-full font-bold text-sm shadow-md"
-            >
-              Remove Room Type
-            </button>
+            
           </div>
         ))}
         

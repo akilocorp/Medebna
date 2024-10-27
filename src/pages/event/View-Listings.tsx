@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+// pages/operator/ViewListingsPage.tsx
+
+import React, { useEffect, useState } from 'react';
 import OperatorLayout from '@/components/operator/operatorLayout';
 import { getAllEvents, deleteEvent, updateEvent } from '@/stores/operator/ApiCallerOperatorEvent';
 import { showToast } from '@/components/popup';
 import { FaTrash, FaEdit } from 'react-icons/fa';
-import Link from 'next/link';
 import { useDispatch } from 'react-redux';
 import { CldUploadWidget } from 'next-cloudinary';
 import { RiUploadCloudFill } from 'react-icons/ri';
@@ -13,6 +14,7 @@ interface EventPrice {
   type: string;
   ticketAvailable: number;
   price: number;
+  status: string;
 }
 
 interface EventDetails {
@@ -29,7 +31,6 @@ interface EventData {
   endTime: string;
   image: string;
   description: string;
-  status: string;
 }
 
 interface Event {
@@ -59,7 +60,6 @@ const ViewListingsPage = () => {
           endTime: event.events?.endTime || 'N/A',
           image: event.events?.image || 'N/A',
           description: event.events?.description || 'N/A',
-          status: event.events?.status || 'N/A',
         },
         eventPrices: event.eventPrices || [],
         eventDetails: event.eventDetails || {},
@@ -74,7 +74,7 @@ const ViewListingsPage = () => {
   useEffect(() => {
     fetchEvents();
   }, []);
-  
+
   const handleImageUpload = (result: any) => {
     if (result.event === 'success' && selectedEvent) {
       const imageUrl = result.info.secure_url;
@@ -87,17 +87,17 @@ const ViewListingsPage = () => {
       });
     }
   };
-  
+
   const RenderImageUpload = ({ image }: { image: string }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(image);
-  
+
     return (
       <div className="relative mb-4">
         <CldUploadWidget uploadPreset="u06vgrf1" onSuccess={handleImageUpload}>
           {({ open }) => (
             <button
               type="button"
-              className="block w-full p-2 py-2 rounded-full border text-gray-300 border-[#fccc52] cursor-pointer flex items-center justify-center bg-[#ffffff] shadow-md"
+              className="flex items-center justify-center w-full p-2 py-2 rounded-full border text-gray-300 border-[#fccc52] cursor-pointer bg-white shadow-md hover:bg-[#fccc52] hover:text-white transition-colors duration-300"
               onClick={() => open()}
             >
               <RiUploadCloudFill className="mr-2 text-lg text-[#ff914d]" />
@@ -107,30 +107,31 @@ const ViewListingsPage = () => {
         </CldUploadWidget>
         {imageUrl && (
           <div className="mt-4">
-            <img src={imageUrl} alt="Event Preview" className="w-32 h-32 rounded-lg shadow-md" />
+            <img src={imageUrl} alt="Event Preview" className="w-32 h-32 rounded-lg shadow-md object-cover" />
           </div>
         )}
       </div>
     );
   };
+
   const handleDelete = async (id: string) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this event? This action cannot be undone.");
     if (confirmDelete) {
-    try {
-      await deleteEvent(id);
-      setEvents(events.filter(event => event._id !== id));
-      showToast('Event deleted successfully', 'success');
-    } catch (error) {
-      showToast('Error deleting event', 'error');
+      try {
+        await deleteEvent(id);
+        setEvents(events.filter(event => event._id !== id));
+        showToast('Event deleted successfully', 'success');
+      } catch (error) {
+        showToast('Error deleting event', 'error');
+      }
     }
-  }
   };
 
   const handleEdit = (event: Event) => {
     setSelectedEvent(event);
     setIsModalOpen(true);
   };
-  
+
   const handleUpdate = async () => {
     if (selectedEvent) {
       try {
@@ -138,7 +139,7 @@ const ViewListingsPage = () => {
         if (!token) {
           throw new Error("Token not found");
         }
-  
+
         const updatedEvent = await updateEvent(selectedEvent, selectedEvent._id, token);
         
         setEvents(events.map(event => event._id === updatedEvent._id ? updatedEvent : event));
@@ -150,7 +151,6 @@ const ViewListingsPage = () => {
       }
     }
   };
-  
 
   const handleModalClose = () => {
     setSelectedEvent(null);
@@ -168,7 +168,7 @@ const ViewListingsPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#f9f9f9]">
+      <div className="flex items-center justify-center min-h-screen bg-white">
         <div className="text-center">
           <div className="flex justify-center mb-4">
             <svg
@@ -201,89 +201,87 @@ const ViewListingsPage = () => {
   return (
     <OperatorLayout>
       <h1 className="text-3xl font-bold mb-6 text-[#ff914d]">View Events</h1>
-      <div className="overflow-x-auto max-h-[42rem] rounded-lg overflow-y-scroll">
-        <table className="min-w-full bg-[#ffffff] text-[#323232] rounded-lg shadow-md">
-          <thead>
-            <tr className="bg-gradient-to-r from-[#ff914d] to-[#fccc52] text-[#ffffff]">
-              <th className="py-2 px-4">Image</th>
-              <th className="py-2 px-4">Location</th>
-              <th className="py-2 px-4">Date</th>
-              <th className="py-2 px-4">Start Time</th>
-              <th className="py-2 px-4">End Time</th>
-              <th className="py-2 px-4">Description</th>
-              <th className="py-2 px-4">Status</th>
-              <th className="py-2 px-4">Ticket Type</th>
-              <th className="py-2 px-4">Tickets Available</th>
-              <th className="py-2 px-4">Price</th>
-              <th className="py-2 px-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.isArray(events) && events.length > 0 ? (
-              events.map((event) => (
-                <>
-                  {event.eventPrices.map((price, index) => (
-                    <tr key={`${event._id}-${price._id}`} className="border-t border-[#ff914d]">
-                      {index === 0 && (
-                        <>
-                          <td className="py-2 px-4" rowSpan={event.eventPrices.length}>
-                            <img src={event.events.image} alt={event.events.location} className="w-14 h-14 object-cover rounded-lg shadow-md" />
-                          </td>
-                          <td className="py-2 px-4" rowSpan={event.eventPrices.length}>
-                            {event.events.location}
-                          </td>
-                          <td className="py-2 px-4" rowSpan={event.eventPrices.length}>
-                            {formatDate(event.events.date)}
-                          </td>
-                          <td className="py-2 px-4" rowSpan={event.eventPrices.length}>
-                            {event.events.startTime}
-                          </td>
-                          <td className="py-2 px-4" rowSpan={event.eventPrices.length}>
-                            {event.events.endTime}
-                          </td>
-                          <td className="py-2 px-4" rowSpan={event.eventPrices.length}>
-                            {event.events.description}
-                          </td>
-                          <td className="py-2 px-4" rowSpan={event.eventPrices.length}>
-                            {event.events.status}
-                          </td>
-                        </>
-                      )}
-                      <td className="py-2 px-4">{price.type}</td>
-                      <td className="py-2 px-4">{price.ticketAvailable}</td>
-                      <td className="py-2 px-4">{price.price}</td>
-                      {index === 0 && (
-                        <td className="py-2 px-4 flex space-x-2" rowSpan={event.eventPrices.length}>
-                          <button onClick={() => handleEdit(event)} className="bg-[#fccc52] bg-opacity-20 text-center p-2 text-[#fccc52] rounded-full hover:text-[#ff914d]">
-                            <FaEdit />
-                          </button>
-                          <button onClick={() => handleDelete(event._id)} className="text-red-500 bg-red-500 bg-opacity-20 text-center p-2 rounded-full hover:text-red-600">
-                            <FaTrash />
-                          </button>
-                        </td>
-                      )}
-                    </tr>
+      
+      {/* Vertical Stack of Horizontally Oriented Cards */}
+      <div className="space-y-6">
+        {Array.isArray(events) && events.length > 0 ? (
+          events.map((event) => (
+            <div key={event._id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col md:flex-row">
+              {/* Event Image */}
+              <div className="md:w-1/3">
+                <img
+                  src={event.events.image}
+                  alt={event.events.location}
+                  className="w-full h-48 object-cover rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
+                />
+                {/* Event Details Toggle */}
+                <details className="mt-4 p-2">
+                  <summary className="cursor-pointer text-[#ff914d] font-semibold">View Details</summary>
+                  <div className="mt-2 text-gray-700">
+                    <p><strong>Details:</strong> {event.eventDetails.details}</p>
+                    <p><strong>Ticket Info:</strong> {event.eventDetails.ticketInfo}</p>
+                    <p><strong>Additional Info:</strong> {event.eventDetails.additionalInfo}</p>
+                    <p><strong>Food and Drink:</strong> {event.eventDetails.foodAndDrink}</p>
+                  </div>
+                </details>
+              </div>
+              
+              {/* Event Details */}
+              <div className="p-4 md:w-2/3 flex flex-col justify-between">
+                {/* Header with Event Info and Action Buttons */}
+                <div className="flex justify-between items-start">
+                  {/* Event Information */}
+                  <div className="flex-1 pr-4">
+                    <h2 className="text-2xl font-bold text-[#ff914d] mb-2">{event.events.location}</h2>
+                    <p className="text-gray-600 mb-1"><strong>Date:</strong> {formatDate(event.events.date)}</p>
+                    <p className="text-gray-600 mb-1"><strong>Time:</strong> {event.events.startTime} - {event.events.endTime}</p>
+                    <p className="text-gray-700 mt-2">{event.events.description}</p>
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex flex-row justify-between gap-4">
+                    <button
+                      onClick={() => handleEdit(event)}
+                      className="flex items-center justify-center bg-[#fccc52] bg-opacity-40 text-[#ff914d] p-3 rounded-full shadow hover:bg-opacity-100 hover:text-white transition-colors duration-300"
+                    >
+                      <FaEdit /> 
+                    </button>
+                    <button
+                      onClick={() => handleDelete(event._id)}
+                      className="flex items-center justify-center bg-red-200 text-red-500 p-3 rounded-full shadow hover:bg-red-300 transition-colors duration-300"
+                    >
+                      <FaTrash /> 
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Ticket Prices */}
+                <div className="mt-4">
+                  <h3 className="text-lg font-bold text-[#ff914d] mb-2">Ticket Prices</h3>
+                  {event.eventPrices.map((price) => (
+                    <div key={price._id} className="flex justify-between items-center bg-gray-100 p-3 mb-2 rounded">
+                      <div>
+                        <p className="text-gray-800"><strong>Type:</strong> {price.type}</p>
+                        <p className="text-gray-800"><strong>Available:</strong> {price.ticketAvailable}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-gray-800"><strong>Price:</strong> ${price.price}</p>
+                        <p className={`text-sm ${price.status === 'available' ? 'text-green-600' : 'text-red-600'}`}>
+                          {price.status.charAt(0).toUpperCase() + price.status.slice(1)}
+                        </p>
+                      </div>
+                    </div>
                   ))}
-                  <tr className="border-t border-[#ff914d]">
-                    <td colSpan={10} className="bg-[#f9f9f9] p-4">
-                      <h3 className="text-lg font-bold text-[#ff914d]">Event Details</h3>
-                      <p><strong>Details:</strong> {event.eventDetails.details}</p>
-                      <p><strong>Ticket Info:</strong> {event.eventDetails.ticketInfo}</p>
-                      <p><strong>Additional Info:</strong> {event.eventDetails.additionalInfo}</p>
-                      <p><strong>Food and Drink:</strong> {event.eventDetails.foodAndDrink}</p>
-                    </td>
-                  </tr>
-                </>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={10} className="text-center py-4">No events found</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-center">No events found</p>
+        )}
       </div>
 
+      {/* Modal for Editing Events */}
       {isModalOpen && selectedEvent && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -304,6 +302,7 @@ const ViewListingsPage = () => {
                 }
                 className="border border-gray-300 bg-white text-black p-3 rounded-full w-full focus:outline-none focus:ring-2 focus:ring-[#fccc52]"
               />
+              
               <label className="block mb-2 mt-4 text-black text-sm font-semibold">Date</label>
               <input
                 type="date"
@@ -319,6 +318,7 @@ const ViewListingsPage = () => {
                 }
                 className="border border-gray-300 bg-white text-black p-3 rounded-full w-full focus:outline-none focus:ring-2 focus:ring-[#fccc52]"
               />
+              
               <label className="block mb-2 mt-4 text-black text-sm font-semibold">Start Time</label>
               <input
                 type="time"
@@ -334,6 +334,7 @@ const ViewListingsPage = () => {
                 }
                 className="border border-gray-300 bg-white text-black p-3 rounded-full w-full focus:outline-none focus:ring-2 focus:ring-[#fccc52]"
               />
+              
               <label className="block mb-2 mt-4 text-black text-sm font-semibold">End Time</label>
               <input
                 type="time"
@@ -349,8 +350,10 @@ const ViewListingsPage = () => {
                 }
                 className="border border-gray-300 bg-white text-black p-3 rounded-full w-full focus:outline-none focus:ring-2 focus:ring-[#fccc52]"
               />
+              
               <label className="block mb-2 mt-4 text-black text-sm font-semibold">Event Image</label>
               <RenderImageUpload image={selectedEvent.events.image} />
+              
               <label className="block mb-2 mt-4 text-black text-sm font-semibold">Description</label>
               <textarea
                 value={selectedEvent.events.description}
@@ -365,22 +368,6 @@ const ViewListingsPage = () => {
                 }
                 className="border border-gray-300 bg-white text-black p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#fccc52]"
               />
-              <label className="block mb-2 mt-4 text-black text-sm font-semibold">Status</label>
-              <select
-                value={selectedEvent.events.status}
-                onChange={(e) =>
-                  setSelectedEvent({
-                    ...selectedEvent,
-                    events:{
-                      ...selectedEvent.events,
-                      status: e.target.value,}
-                  })
-                }
-                className="border border-gray-300 bg-white text-black p-3 rounded-full w-full focus:outline-none focus:ring-2 focus:ring-[#fccc52]"
-              >
-                <option value="available">Available</option>
-                <option value="booked">Booked</option>
-              </select>
 
               {/* Event Prices Editing */}
               <h3 className="text-lg font-bold text-[#ff914d] mt-6 mb-4">Event Prices</h3>
@@ -400,6 +387,7 @@ const ViewListingsPage = () => {
                     }}
                     className="border border-gray-300 bg-white text-black p-3 rounded-full w-full focus:outline-none focus:ring-2 focus:ring-[#fccc52]"
                   />
+                  
                   <label className="block mb-2 mt-4 text-black text-sm font-semibold">Tickets Available</label>
                   <input
                     type="number"
@@ -414,6 +402,7 @@ const ViewListingsPage = () => {
                     }}
                     className="border border-gray-300 bg-white text-black p-3 rounded-full w-full focus:outline-none focus:ring-2 focus:ring-[#fccc52]"
                   />
+                  
                   <label className="block mb-2 mt-4 text-black text-sm font-semibold">Price</label>
                   <input
                     type="number"
@@ -428,6 +417,23 @@ const ViewListingsPage = () => {
                     }}
                     className="border border-gray-300 bg-white text-black p-3 rounded-full w-full focus:outline-none focus:ring-2 focus:ring-[#fccc52]"
                   />
+                  
+                  <label className="block mb-2 mt-4 text-black text-sm font-semibold">Status</label>
+                  <select
+                    value={price.status}
+                    onChange={(e) =>{
+                      const updatedPrices = [...selectedEvent.eventPrices];
+                      updatedPrices[index].status  = e.target.value;
+                      setSelectedEvent({
+                        ...selectedEvent,
+                        eventPrices: updatedPrices,
+                      });
+                    }}
+                    className="border border-gray-300 bg-white text-black p-3 rounded-full w-full focus:outline-none focus:ring-2 focus:ring-[#fccc52]"
+                  >
+                    <option value="available">Available</option>
+                    <option value="booked">Booked</option>
+                  </select>
                 </div>
               ))}
 
@@ -447,6 +453,7 @@ const ViewListingsPage = () => {
                 }
                 className="border border-gray-300 bg-white text-black p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#fccc52]"
               />
+              
               <label className="block mb-2 mt-4 text-black text-sm font-semibold">Ticket Info</label>
               <textarea
                 value={selectedEvent.eventDetails.ticketInfo}
@@ -461,6 +468,7 @@ const ViewListingsPage = () => {
                 }
                 className="border border-gray-300 bg-white text-black p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#fccc52]"
               />
+              
               <label className="block mb-2 mt-4 text-black text-sm font-semibold">Additional Info</label>
               <textarea
                 value={selectedEvent.eventDetails.additionalInfo}
@@ -475,6 +483,7 @@ const ViewListingsPage = () => {
                 }
                 className="border border-gray-300 bg-white text-black p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#fccc52]"
               />
+              
               <label className="block mb-2 mt-4 text-black text-sm font-semibold">Food and Drink</label>
               <textarea
                 value={selectedEvent.eventDetails.foodAndDrink}
@@ -490,6 +499,7 @@ const ViewListingsPage = () => {
                 className="border border-gray-300 bg-white text-black p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#fccc52]"
               />
 
+              {/* Action Buttons */}
               <div className="flex justify-end mt-6">
                 <button
                   onClick={handleUpdate}

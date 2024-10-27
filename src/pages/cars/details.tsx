@@ -1,3 +1,4 @@
+// Import necessary libraries and components
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -9,21 +10,50 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import { Button } from "@mui/material";
+import { Button, Paper } from "@mui/material";
 import { FaCar, FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import { useSwipeable } from "react-swipeable";
 import CartIcon from "@/components/carticon";
 import { getCarListing } from "@/stores/operator/ApiCallerOperatorCar";
 import { fetchCarOwnerProfileWithoutToken } from "@/stores/operator/carprofileapicaller";
+import { addToCartcar } from "@/stores/cart/carapicaller";
 
+// Define interfaces
 interface CarCategory {
   popularFeatures: string[];
   safetyFeatures: string[];
   comfortFeatures: string[];
   entertainmentFeatures: string[];
 }
-interface CarProfile {
-  features: keyof CarCategory;
+
+interface CarSpecificity {
+  _id: string;
+  numberOfCars: number;
+  color: string;
+  status: string;
+  image: string;
+}
+
+interface Car {
+  _id: string;
+  type: string; // The car type (e.g., SUV, V88)
+  price: number;
+  description: string;
+  carSpecificity: CarSpecificity[]; // Array of carSpecificity properties
+}
+
+interface CarDetails {
+  _id: string;
+  details: string;
+  rentalInfo: string;
+  additionalInfo: string;
+}
+
+interface CarType {
+  _id: string;
+  createdBy: string;
+  cars: Car[]; // Array of cars
+  carDetails: CarDetails; // Additional details of the car
 }
 
 interface CarOwnerProfile {
@@ -44,22 +74,6 @@ interface CarOwnerProfile {
   };
 }
 
-interface Car {
-  id: string;
-  model: string;
-  status: string;
-}
-
-interface CarType {
-  _id: string;
-  type: string;
-  price: number;
-  image: string;
-  description: string;
-  features: CarCategory;
-  cars: Car[];
-}
-
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -67,6 +81,7 @@ interface TabPanelProps {
   dir?: Direction;
 }
 
+// TabPanel Component
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, dir, ...other } = props;
 
@@ -87,6 +102,7 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
+// Accessibility props for tabs
 function a11yProps(index: number) {
   return {
     id: `full-width-tab-${index}`,
@@ -94,10 +110,12 @@ function a11yProps(index: number) {
   };
 }
 
+// Main Component
 export default function ChooseCar() {
   const router = useRouter();
   const { carId, rentalName } = router.query;
 
+  // State variables
   const [carTypes, setCarTypes] = useState<CarType[]>([]);
   const [filteredCars, setFilteredCars] = useState<CarType[]>([]);
   const [selectedCar, setSelectedCar] = useState<CarType | null>(null);
@@ -105,12 +123,22 @@ export default function ChooseCar() {
   const theme = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [numCars, setNumCars] = useState(1);
-  const [carModel, setCarModel] = useState("");
+  const [carTypeId, setCarTypeId] = useState("");
+  const [carColorId, setCarColorId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isMounted, setIsMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [carOwnerProfile, setCarOwnerProfile] = useState<CarOwnerProfile | null>(null);
 
+  // Initialize swipe handlers
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => setValue((prev) => Math.min(prev + 1, 2)),
+    onSwipedRight: () => setValue((prev) => Math.max(prev - 1, 0)),
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true,
+  });
+
+  // Fetch data on mount or when carId changes
   useEffect(() => {
     setIsMounted(true);
 
@@ -120,34 +148,19 @@ export default function ChooseCar() {
     }
   }, [carId]);
 
+  // Fetch car listings
   const fetchCarListingData = async (id: string) => {
     setLoading(true);
     try {
-      const response: CarType[] = await getCarListing(id); // Explicitly typing the response
-      if (response && response.length > 0) {
-        const carTypes = response
-          .map((carObject: CarType) => {
-            if (carObject.cars && carObject.cars.length > 0) {
-              return carObject.cars.map((car: Car) => ({
-                _id: carObject._id, // Include the _id field from carObject
-                type: carObject.type || "Unknown Car Type",
-                price: carObject.price || 0,
-                image: carObject.image || "/assets/default-car.png",
-                description: carObject.description || "No description available.",
-                features: carObject.features || {}, // Assuming carDetails are features
-                cars: carObject.cars,
-              }));
-            } else {
-              console.error("Car data is missing or empty in one of the car objects.");
-              return [];
-            }
-          })
-          .flat(); // Flattening the array in case of nested arrays
+      const carTypes = await getCarListing(id);
+      console.log("carTypes:", carTypes);
 
-        setCarTypes(carTypes as CarType[]); // Cast the result to CarType[]
-        setFilteredCars(carTypes as CarType[]); // Cast the result to CarType[]
+      if (carTypes && carTypes.length > 0) {
+        setCarTypes(carTypes);
+        setFilteredCars(carTypes); // Set filtered cars to display initially
       } else {
         console.error("No car types found for this rental");
+        setFilteredCars([]);
       }
     } catch (error) {
       console.error("Error fetching car listing data:", error);
@@ -156,6 +169,7 @@ export default function ChooseCar() {
     }
   };
 
+  // Fetch car owner profile
   const fetchCarOwnerProfile = async (id: string) => {
     setLoading(true);
     try {
@@ -172,48 +186,73 @@ export default function ChooseCar() {
     }
   };
 
+  // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.target.value.toLowerCase();
     setSearchTerm(searchValue);
 
     const filtered = carTypes.filter(
       (car) =>
-        car.type.toLowerCase().includes(searchValue) ||
-        car.description.toLowerCase().includes(searchValue)
+        car.cars.some((c) => c.type.toLowerCase().includes(searchValue)) ||
+        car.cars.some((c) => c.description.toLowerCase().includes(searchValue))
     );
 
     setFilteredCars(filtered);
   };
 
-  const handleCarClick = (car: CarType) => {
-    setSelectedCar(car);
-    setIsModalOpen(true);
-  };
-
+  // Handle tab change
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
   };
 
-  const handleAddToCart = () => {
-    if (numCars < 1) {
-      alert("Please enter a valid number of cars.");
-      return;
-    }
-
-    if (!carModel) {
-      alert("Please select a car model.");
-      return;
-    }
-
-    setIsModalOpen(false);
-    console.log("Car added to cart");
+  // Handle car card click
+  const handleCarClick = (car: CarType) => {
+    setSelectedCar(car);
+    setCarTypeId(car._id);
+    setIsModalOpen(true);
   };
 
-  const handlers = useSwipeable({
-    onSwipedLeft: () => setValue((prev) => Math.min(prev + 1, 2)),
-    onSwipedRight: () => setValue((prev) => Math.max(prev - 1, 0)),
-  });
+  // Handle adding car to cart
+  const handleAddToCart = async () => {
+    if (!selectedCar || !carTypeId || !carColorId) {
+      alert("Please select a car type and color before proceeding.");
+      return;
+    }
 
+    const sessionId = localStorage.getItem("sessionId");
+    if (!sessionId) {
+      alert("No session found. Please try again.");
+      return;
+    }
+
+    const dataToSend = {
+      id: carTypeId, // Use the car's `_id`
+      productType: "car",
+      roomId: "", // Optional for cars
+      carTypeId: selectedCar.cars[0]._id, // Ensure this is the carTypeId (car._id)
+      carColorId: carColorId, // Ensure this is the car color's `_id` (from carSpecificity)
+      numberOfTickets: numCars,
+      sessionId,
+    };
+
+    try {
+      await addToCartcar(
+        dataToSend.id,
+        dataToSend.productType,
+        dataToSend.roomId,
+        dataToSend.carTypeId,
+        dataToSend.carColorId,
+        dataToSend.numberOfTickets
+      );
+      alert("Car added to cart successfully!");
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error adding car to cart:", error);
+      alert("Failed to add car to cart. Please try again.");
+    }
+  };
+
+  // Render stars based on rating
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 >= 0.5;
@@ -236,10 +275,12 @@ export default function ChooseCar() {
     );
   };
 
+  // Render nothing if not mounted
   if (!isMounted) {
     return null;
   }
 
+  // Loading state
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#f9f9f9]">
@@ -275,53 +316,98 @@ export default function ChooseCar() {
   }
 
   return (
-    <div className="bg-[#ffffff] min-h-screen text-[#000000]" {...handlers}>
-      <AppBar position="static" style={{ backgroundColor: "#ffffff" }}>
-        <div className="relative flex justify-between items-center px-4">
+    <div
+      className="bg-[#ffffff] min-h-screen text-[#000000]"
+      {...swipeHandlers}
+    >
+      {/* Custom AppBar with Rounded Corners and Padding */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          padding: "16px 0",
+          backgroundColor: "#f5f5f5",
+        }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            borderRadius: "20px",
+            width: { xs: "90%", sm: "80%", md: "70%", lg: "60%" },
+            backgroundColor: "#fcd152",
+            padding: "8px 16px",
+            display: "flex",
+            alignItems: "center",
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+            position: "relative",
+          }}
+          className="mx-4"
+        >
+          {/* Tabs */}
           <Tabs
             value={value}
             onChange={handleChange}
             textColor="inherit"
             indicatorColor="primary"
-            aria-label="full width tabs example"
-            variant="fullWidth"
-            centered
+            aria-label="customized tabs example"
+            variant="scrollable"
+            scrollButtons="auto"
             sx={{
               "& .MuiTabs-indicator": {
-                backgroundColor: "#fccc52",
+                backgroundColor: "#ffffff",
+                height: "4px",
+                borderRadius: "2px",
               },
               "& .MuiTab-root": {
-                color: "black",
+                color: "#323232",
+                fontSize: "1.1rem",
+                fontWeight: "bold",
+                textTransform: "none",
+                letterSpacing: "0.5px",
+                padding: "12px 16px",
+                borderRadius: "10px",
+                transition: "background-color 0.3s, color 0.3s",
               },
               "& .Mui-selected": {
-                color: "black",
+                color: "#ffffff",
+                backgroundColor: "#fcc652",
+                boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.2)",
               },
             }}
           >
-            <Tab label="Overview & Prices" {...a11yProps(0)} />
+            <Tab label="Overview" {...a11yProps(0)} />
             <Tab label="Car Details" {...a11yProps(1)} />
             <Tab label="Rental Info" {...a11yProps(2)} />
           </Tabs>
-          <div className="absolute top-3 right-4">
-            <CartIcon />
-          </div>
-        </div>
-      </AppBar>
 
+          {/* Cart Icon */}
+          <Box sx={{ position: "absolute", right: "16px" }}>
+            <CartIcon />
+          </Box>
+        </Paper>
+      </Box>
+
+      {/* Tab Panels */}
       <div>
+        {/* Overview & Prices Tab */}
         <TabPanel value={value} index={0} dir={theme.direction}>
+          {/* Back Button */}
           <div className="p-4">
             <Link href="/cars" legacyBehavior>
-              <a className="inline-flex items-center bg-gradient-to-r from-[#fccc52] to-[#ff914d] text-[#323232] mb-8 px-4 py-2 bg-[#ff914d] bg-opacity-90 rounded-lg hover:bg-[#fccc52] hover:text-[#ffffff] transition-colors duration-300">
+              <a className="inline-flex items-center bg-gradient-to-r from-[#fccc52] to-[#ff914d] text-[#323232] mb-8 px-4 py-2 bg-opacity-90 rounded-lg hover:bg-[#fccc52] hover:text-[#ffffff] transition-colors duration-300">
                 <IoChevronBack className="mr-2 text-2xl" />
+              
               </a>
             </Link>
           </div>
+
+          {/* Header Section */}
           <div className="w-full max-w-8xl p-4 flex flex-col items-center">
             <div className="flex flex-col items-center text-center py-4 px-10">
               <h1 className="text-3xl lg:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#fccc52] to-[#ff914d] drop-shadow-md mb-8">
                 Choose Your Car at {rentalName}
               </h1>
+              {/* Search Bar */}
               <div className="flex items-center mb-8 w-full max-w-md">
                 <input
                   type="text"
@@ -330,7 +416,7 @@ export default function ChooseCar() {
                   onChange={handleSearchChange}
                   className="flex-grow px-4 py-2 rounded-full bg-gray-100 border-2 border-[#fccc52] shadow-lg text-[#323232] focus:outline-none focus:border-[#ff914d] hover:border-[#ff914d]"
                 />
-                <button className="sm:ml-4 px-4 py-2 bg-gradient-to-r from-[#fccc52] to-[#ff914d] font-md drop-shadow-md text-[#323232] rounded-lg transition-colors duration-300">
+                <button className="ml-4 px-4 py-2 bg-gradient-to-r from-[#fccc52] to-[#ff914d] font-md drop-shadow-md text-[#323232] rounded-lg transition-colors duration-300">
                   Search
                 </button>
               </div>
@@ -339,37 +425,46 @@ export default function ChooseCar() {
               </p>
             </div>
           </div>
+
+          {/* Cars List */}
           <main className="bg-[#ffffff] text-[#323232] p-8 flex flex-col items-center">
             <div className="w-full max-w-6xl flex flex-col items-center">
               <div className="flex flex-wrap justify-between gap-8">
                 {filteredCars && filteredCars.length > 0 ? (
-                  filteredCars.map((car, index) =>
-                    car && car._id ? (
+                  filteredCars.map((carType) =>
+                    carType.cars.length > 0 ? (
                       <div
-                        key={car._id}
+                        key={carType._id}
                         className="w-[320px] md:w-[350px] bg-[#ff914d] bg-opacity-5 rounded-3xl shadow-lg flex-shrink-0 transform transition duration-500 hover:scale-105 hover:shadow-2xl flex flex-col overflow-hidden cursor-pointer"
-                        onClick={() => handleCarClick(car)}
+                        onClick={() => handleCarClick(carType)}
                       >
+                        {/* Car Image */}
                         <div className="w-full h-48 bg-gray-300 rounded-t-3xl overflow-hidden mb-4">
-                          <img
-                            src={car.image || "/assets/default-car.png"} // Use a default image if car.image is undefined
-                            alt={car.type || "Car image"} // Provide a fallback alt text if car.type is undefined
-                            className="w-full h-full object-cover"
-                          />
+                          {carType.cars[0]?.carSpecificity[0]?.image ? (
+                            <img
+                              src={carType.cars[0].carSpecificity[0].image}
+                              alt={carType.cars[0].type}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <img
+                              src="/assets/default-car.png"
+                              alt="Default car"
+                              className="w-full h-full object-cover"
+                            />
+                          )}
                         </div>
+                        {/* Car Details */}
                         <div className="px-6 py-4 flex justify-between w-full items-center">
                           <div>
                             <h3 className="text-xl font-extrabold text-gray-800 drop-shadow-md text-left">
-                              {car.type || "Unknown Car Type"}{" "}
-                              {/* Provide a fallback for car.type */}
+                              {carType.cars[0].type || "Unknown Car Type"}
                             </h3>
                             <p className="text-left mb-2 text-sm text-gray-600 drop-shadow-md">
-                              {car.description || "No description available."}{" "}
-                              {/* Provide a fallback for car.description */}
+                              {carType.cars[0].description || "No description available."}
                             </p>
                             <p className="text-left mb-2 text-sm text-gray-600 drop-shadow-md">
-                              ${car.price || "N/A"} per day{" "}
-                              {/* Provide a fallback for car.price */}
+                              ${carType.cars[0].price || "N/A"} per day
                             </p>
                           </div>
                           <div className="text-3xl text-[#fccc52]">
@@ -378,82 +473,93 @@ export default function ChooseCar() {
                         </div>
                       </div>
                     ) : (
-                      <div key={index} className="text-red-500">
-                        Invalid car data
+                      <div key={carType._id} className="text-red-500">
+                        No cars available for this car type
                       </div>
                     )
                   )
                 ) : (
-                  <p>No cars available</p>
+                  <p>No cars available for this rental</p>
                 )}
               </div>
             </div>
 
+            {/* Modal for selected car */}
             {isModalOpen && selectedCar && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                 <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+                  {/* Selected Car Details */}
                   <h2 className="text-2xl drop-shadow-md font-bold text-[#fccc52] mb-4">
-                    {selectedCar.type}
+                    {selectedCar.cars[0].type || "Unknown Car Type"}
                   </h2>
-                  <p className="mb-2 drop-shadow-md">
-                    {selectedCar.description}
+                  <p className="text-left mb-2 text-sm text-gray-600 drop-shadow-md">
+                    {selectedCar.cars[0].description || "No description available."}
                   </p>
-                  <p className="mb-4 drop-shadow-md">
-                    ${selectedCar.price} per day
+                  <p className="text-left mb-2 text-sm text-gray-600 drop-shadow-md">
+                    ${selectedCar.cars[0].price || "N/A"} per day
                   </p>
 
-                  <div className="mb-4 text-[#fccc52]">
-                    <label className="block text-sm mb-2 drop-shadow-md">
+                  {/* Car Color Selection */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-center">
+                    {selectedCar.cars[0].carSpecificity.map((specificity) => (
+                      <button
+                        key={specificity._id}
+                        className={`flex flex-col items-center p-2 w-32 h-32 rounded-lg cursor-pointer border-4 transition-all duration-300 ${
+                          carColorId === specificity._id
+                            ? "border-[#fccc52] bg-gray-100 "
+                            : "border-gray-300"
+                        } hover:scale-105 hover:shadow-xl`}
+                        onClick={() => setCarColorId(specificity._id)}
+                      >
+                        <img
+                          src={specificity.image}
+                          alt={specificity.color}
+                          className="w-24 h-24 rounded-lg object-cover"
+                        />
+                        <span className="text-sm text-gray-700 mt-2">
+                          {specificity.color}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Ticket Selection */}
+                  <div className="mt-6">
+                    <label className="text-lg font-bold text-[#fccc52] mb-4 block">
                       Number of Cars
                     </label>
                     <input
                       type="number"
+                      min="1"
                       value={numCars}
                       onChange={(e) => setNumCars(Number(e.target.value))}
-                      className="rounded-full bg-gray-100 border-2 border-[#fccc52] shadow-lg text-[#323232] px-4 py-2 focus:outline-none focus:border-[#ff914d] hover:border-[#ff914d]"
+                      className="w-full px-4 py-2 rounded-full bg-gray-100 border-2 border-[#fccc52] shadow-lg text-[#323232] focus:outline-none focus:border-[#ff914d] text-sm hover:border-[#ff914d]"
                       required
-                      min="1"
                     />
                   </div>
 
-                  <div className="mb-4 text-[#fccc52]">
-                    <label className="block text-sm drop-shadow-md mb-2">
-                      Car Model
-                    </label>
-                    <select
-                      value={carModel}
-                      onChange={(e) => setCarModel(e.target.value)}
-                      required
-                      className="rounded-full bg-gray-100 border-2 border-[#fccc52] shadow-lg text-[#323232] px-4 py-2 focus:outline-none focus:border-[#ff914d] hover:border-[#ff914d]"
+                  {/* Action Buttons */}
+                  <div className="flex justify-between mt-4">
+                    <button
+                      className="bg-[#fccc52] text-[#323232] px-6 py-2 rounded-lg"
+                      onClick={handleAddToCart}
                     >
-                      <option value="">Select Car Model</option>
-                      {selectedCar.cars
-                        .filter((car) => car.status === "available")
-                        .map((car) => (
-                          <option key={car.model} value={car.model}>
-                            {car.model}
-                          </option>
-                        ))}
-                    </select>
+                      Add to Cart
+                    </button>
+                    <button
+                      className="ml-4 text-red-500"
+                      onClick={() => setIsModalOpen(false)}
+                    >
+                      Cancel
+                    </button>
                   </div>
-
-                  <button
-                    className="bg-[#fccc52] text-[#323232] px-6 py-2 mt-4 rounded-lg"
-                    onClick={handleAddToCart}
-                  >
-                    Add to Cart
-                  </button>
-                  <button
-                    className="ml-4 text-red-500"
-                    onClick={() => setIsModalOpen(false)}
-                  >
-                    Cancel
-                  </button>
                 </div>
               </div>
             )}
           </main>
         </TabPanel>
+
+        {/* Car Details Tab */}
         <TabPanel value={value} index={1} dir={theme.direction}>
           {carOwnerProfile && (
             <Box className="p-8 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
@@ -473,9 +579,19 @@ export default function ChooseCar() {
                   {renderStars(carOwnerProfile.rating)}
                 </Typography>
               </Box>
+              <Box className="mb-4">
+                <Typography variant="h5" className="text-[#323232] font-bold">
+                  Description:
+                </Typography>
+                <Typography variant="body1" className="text-[#323232]">
+                  {carOwnerProfile.description}
+                </Typography>
+              </Box>
             </Box>
           )}
         </TabPanel>
+
+        {/* Rental Info Tab */}
         <TabPanel value={value} index={2} dir={theme.direction}>
           <Box
             className="bg-[#ffffff] p-8 rounded-3xl shadow-2xl"
@@ -509,11 +625,14 @@ export default function ChooseCar() {
             {carOwnerProfile && (
               <>
                 <Box display="flex" flexDirection="column" gap={4}>
+                  {/* Rental Duration */}
                   <Box
                     p={4}
                     sx={{
                       backgroundColor: "#ffffff",
                       color: "#323232",
+                      borderRadius: "15px",
+                      boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
                     }}
                   >
                     <Typography
@@ -531,13 +650,16 @@ export default function ChooseCar() {
                     <Typography fontSize="1.1rem">
                       {carOwnerProfile.rentalRules.rentalDuration}
                     </Typography>
-                    
                   </Box>
+
+                  {/* Rental Description */}
                   <Box
                     p={4}
                     sx={{
                       backgroundColor: "#ffffff",
                       color: "#323232",
+                      borderRadius: "15px",
+                      boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
                     }}
                   >
                     <Typography
@@ -557,12 +679,14 @@ export default function ChooseCar() {
                     </Typography>
                   </Box>
 
+                  {/* Check-out Rule */}
                   <Box
                     p={4}
-                    borderRadius="20px"
+                    borderRadius="15px"
                     sx={{
                       backgroundColor: "#ffffff",
                       color: "#323232",
+                      boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
                     }}
                   >
                     <Typography
@@ -577,17 +701,17 @@ export default function ChooseCar() {
                     >
                       Check-out
                     </Typography>
-                    <Typography fontSize="1.1rem">
-                      Until 12:00
-                    </Typography>
+                    <Typography fontSize="1.1rem">Until 12:00</Typography>
                   </Box>
 
+                  {/* Cancellation/Prepayment */}
                   <Box
                     p={4}
-                    borderRadius="20px"
+                    borderRadius="15px"
                     sx={{
                       backgroundColor: "#ffffff",
                       color: "#323232",
+                      boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
                     }}
                   >
                     <Typography
@@ -600,19 +724,21 @@ export default function ChooseCar() {
                         textShadow: "1px 1px 2px rgba(0, 0, 0, 0.2)",
                       }}
                     >
-                      Cancellation/ prepayment
+                      Cancellation/ Prepayment
                     </Typography>
                     <Typography fontSize="1rem">
                       {carOwnerProfile.rentalRules.cancellationPolicy}
                     </Typography>
                   </Box>
 
+                  {/* Children and Beds */}
                   <Box
                     p={4}
-                    borderRadius="20px"
+                    borderRadius="15px"
                     sx={{
                       backgroundColor: "#ffffff",
                       color: "#323232",
+                      boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
                     }}
                   >
                     <Typography
@@ -625,7 +751,7 @@ export default function ChooseCar() {
                         textShadow: "1px 1px 2px rgba(0, 0, 0, 0.2)",
                       }}
                     >
-                      Children and beds
+                      Children and Beds
                     </Typography>
                     <Typography fontSize="1.1rem">Child policies</Typography>
                     <Typography fontSize="1rem">
@@ -636,12 +762,14 @@ export default function ChooseCar() {
                     </Typography>
                   </Box>
 
+                  {/* No Age Restriction */}
                   <Box
                     p={4}
-                    borderRadius="20px"
+                    borderRadius="15px"
                     sx={{
                       backgroundColor: "#ffffff",
                       color: "#323232",
+                      boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
                     }}
                   >
                     <Typography
@@ -654,7 +782,7 @@ export default function ChooseCar() {
                         textShadow: "1px 1px 2px rgba(0, 0, 0, 0.2)",
                       }}
                     >
-                      No age restriction
+                      No Age Restriction
                     </Typography>
                     <Typography fontSize="1.1rem">
                       {carOwnerProfile.rentalRules.noAgeRestriction
@@ -662,14 +790,15 @@ export default function ChooseCar() {
                         : "Age restriction applies"}
                     </Typography>
                   </Box>
-                 
 
+                  {/* Accepted Payment Methods */}
                   <Box
                     p={4}
-                    borderRadius="20px"
+                    borderRadius="15px"
                     sx={{
                       backgroundColor: "#ffffff",
                       color: "#323232",
+                      boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
                     }}
                   >
                     <Typography
@@ -682,7 +811,7 @@ export default function ChooseCar() {
                         textShadow: "1px 1px 2px rgba(0, 0, 0, 0.2)",
                       }}
                     >
-                      Accepted payment methods
+                      Accepted Payment Methods
                     </Typography>
                     <Typography fontSize="1.1rem">
                       {carOwnerProfile.rentalRules.acceptedPaymentMethods}

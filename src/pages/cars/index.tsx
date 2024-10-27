@@ -6,6 +6,8 @@ import { FaCar, FaStar, FaStarHalfAlt, FaRegStar } from 'react-icons/fa';
 import { IoChevronBack } from 'react-icons/io5';
 import { fetchCarOwnerProfile } from '@/stores/operator/carprofileapicaller'; 
 import { getHotels } from '@/stores/admin/ApiCallerAdmin'; 
+import dynamic from 'next/dynamic';
+const Map = dynamic(() => import('@/components/map'), { ssr: false });
 
 interface CarRental {
   id: string;
@@ -170,6 +172,7 @@ export default function ChooseCarRental() {
             </p>
           </div>
           <div className="mt-4 lg:mt-0 flex items-center justify-end lg:absolute lg:top-0 lg:right-0 lg:w-1/2 h-64 lg:h-full rounded-lg overflow-hidden">
+          <Map center={[51.505, -0.09]} zoom={13} />
             <img
               src="/assets/cars.png"
               alt="Car Rental"

@@ -25,7 +25,7 @@ const getUserIdFromToken = (): string | null => {
 
 export const addCarRental = async (formData: CarRental, token: string) => {
   try {
-    const response = await fetch("http://194.5.159.228:5003/car/add-car", {
+    const response = await fetch("http://147.79.100.108:5000/car/add-car", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,7 +54,7 @@ export const getCarListings = async () => {
   }
 
   try {
-    const response = await fetch(`http://194.5.159.228:5003/car/car/${operatorId}`, {
+    const response = await fetch(`http://147.79.100.108:5000/car/car/${operatorId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -77,7 +77,7 @@ export const getCarListings = async () => {
 };
 export const getCarListing = async (id: string) => {
   try {
-    const response = await fetch(`http://194.5.159.228:5003/car/car/${id}`, {
+    const response = await fetch(`http://147.79.100.108:5000/car/car/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -93,23 +93,42 @@ export const getCarListing = async (id: string) => {
     const data = await response.json();
     console.log("Full API Response:", data);
 
-    // Aggregate car details from all listings
-    const allCarTypes = data.data.car.flatMap((carListing: any) => 
-      carListing.cars.map((car: any) => ({
-        _id: car._id,
-        type: car.type,
-        price: car.price,
-        image: car.image,
-        description: car.description,
-        features: carListing.carDetails || {},  // Assuming carDetails are the features
-        cars: carListing.cars,
-      }))
-    );
+    // Check if the data contains cars
+    if (data && data.data && Array.isArray(data.data.car)) {
+      const carListings = data.data.car;
 
-    if (allCarTypes.length > 0) {
-      return allCarTypes;
+      // Map the car data properly
+      const allCarTypes = carListings.map((carListing: any) => ({
+        _id: carListing._id,
+        createdBy: carListing.createdBy,
+        cars: carListing.cars.map((car: any) => ({
+          _id: car._id,
+          type: car.type || "Unknown Car Type",
+          price: car.price || 0,
+          description: car.description || "No description available.",
+          carSpecificity: (car.carSpecificity || []).map((specificity: any) => ({
+            _id: specificity._id,
+            color: specificity.color || "Unknown Color",
+            image: specificity.image || "/assets/default-car.png",
+            numberOfCars: specificity.numberOfCars || 0,
+            status: specificity.status || "Unknown Status",
+          })),
+        })),
+        carDetails: {
+          details: carListing.carDetails?.details || "No details available.",
+          rentalInfo: carListing.carDetails?.rentalInfo || "No rental info available.",
+          additionalInfo: carListing.carDetails?.additionalInfo || "No additional info available.",
+        },
+      }));
+
+      if (allCarTypes.length > 0) {
+        return allCarTypes;
+      } else {
+        console.error("No car types found for this listing");
+        return [];
+      }
     } else {
-      throw new Error("No car types found for this listing");
+      throw new Error("Invalid API response structure");
     }
   } catch (error) {
     console.error("Get car listing details error:", error);
@@ -118,10 +137,9 @@ export const getCarListing = async (id: string) => {
 };
 
 
-
 export const updateCarListing = async (carRental: CarRental, id: string, token: string) => {
   try {
-    const response = await fetch(`http://194.5.159.228:5003/car/update-car/${id}`, {
+    const response = await fetch(`http://147.79.100.108:5000/car/update-car/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -147,7 +165,7 @@ export const updateCarListing = async (carRental: CarRental, id: string, token: 
 export const deleteCarListing = async (id: string) => {
   const token = getToken();
   try {
-    const response = await fetch(`http://194.5.159.228:5003/car/delete-car/${id}`, {
+    const response = await fetch(`http://147.79.100.108:5000/car/delete-car/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

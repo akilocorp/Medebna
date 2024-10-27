@@ -1,11 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+interface CarSpecificity {
+  numberOfCars: number;
+  color: string;
+  status: string;
+  image: string;
+}
+
 interface Car {
   type: string;
   price: number;
-  image: string;
   description: string;
-  status: string;
+  carSpecificity: CarSpecificity[]; // Add carSpecificity to the Car interface
 }
 
 interface CarDetails {
@@ -15,10 +21,10 @@ interface CarDetails {
 }
 
 export interface CarRental {
+  id?: string; // Optional id field
   cars: Car[];
   carDetails: CarDetails;
   numberOfCars: number;
-  id?: string;
 }
 
 interface CarRentalState {
