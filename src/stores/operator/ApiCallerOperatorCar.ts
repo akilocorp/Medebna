@@ -25,7 +25,7 @@ const getUserIdFromToken = (): string | null => {
 
 export const addCarRental = async (formData: CarRental, token: string) => {
   try {
-    const response = await fetch("http://147.79.100.108:5000/car/add-car", {
+    const response = await fetch("https://api.medebna.com/car/add-car", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,7 +54,7 @@ export const getCarListings = async () => {
   }
 
   try {
-    const response = await fetch(`http://147.79.100.108:5000/car/car/${operatorId}`, {
+    const response = await fetch(`https://api.medebna.com/car/car/${operatorId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -77,7 +77,7 @@ export const getCarListings = async () => {
 };
 export const getCarListing = async (id: string) => {
   try {
-    const response = await fetch(`http://147.79.100.108:5000/car/car/${id}`, {
+    const response = await fetch(`https://api.medebna.com/car/car/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -139,7 +139,7 @@ export const getCarListing = async (id: string) => {
 
 export const updateCarListing = async (carRental: CarRental, id: string, token: string) => {
   try {
-    const response = await fetch(`http://147.79.100.108:5000/car/update-car/${id}`, {
+    const response = await fetch(`https://api.medebna.com/car/update-car/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -165,7 +165,7 @@ export const updateCarListing = async (carRental: CarRental, id: string, token: 
 export const deleteCarListing = async (id: string) => {
   const token = getToken();
   try {
-    const response = await fetch(`http://147.79.100.108:5000/car/delete-car/${id}`, {
+    const response = await fetch(`https://api.medebna.com/car/delete-car/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

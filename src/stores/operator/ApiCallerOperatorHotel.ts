@@ -48,7 +48,7 @@ const getUserIdFromToken = (): string | null => {
 export const addHotel = async (formData: Hotel) => {
   const token = getToken();
   try {
-    const response = await fetch("http://147.79.100.108:5000/hotel/add-hotel", {
+    const response = await fetch("hhttps://api.medebna.com/hotel/add-hotel", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export const getListings = async () => {
   }
 
   try {
-    const response = await fetch(`http://147.79.100.108:5000/hotel/hotel/${userId}`, {
+    const response = await fetch(`hhttps://api.medebna.com/hotel/hotel/${userId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -105,7 +105,7 @@ export const getListings = async () => {
 };
 export const getListing = async (id: string) => {
   try {
-    const response = await fetch(`http://147.79.100.108:5000/hotel/hotel/${id}`, {
+    const response = await fetch(`hhttps://api.medebna.com/hotel/hotel/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -146,7 +146,7 @@ export const getListing = async (id: string) => {
 export const updateListing = async (listing: Listing) => {
   const token = getToken();
   try {
-    const response = await fetch(`http://147.79.100.108:5000/hotel/update-hotel/${listing._id}`, { // Use _id for backend matching
+    const response = await fetch(`hhttps://api.medebna.com/hotel/update-hotel/${listing._id}`, { // Use _id for backend matching
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -176,7 +176,7 @@ export const updateListing = async (listing: Listing) => {
 export const deleteListing = async (id: string) => {
   const token = getToken();
   try {
-    const response = await fetch(`http://147.79.100.108:5000/hotel/delete-hotel/${id}`, {
+    const response = await fetch(`hhttps://api.medebna.com/hotel/delete-hotel/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

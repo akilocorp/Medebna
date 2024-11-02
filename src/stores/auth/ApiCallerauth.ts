@@ -6,7 +6,7 @@ export type SignInFormData = {
 
 export const signIn = async (formData: SignInFormData) => {
   try {
-    const response = await fetch("http://147.79.100.108:5000/login", {
+    const response = await fetch("https://api.medebna.com/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

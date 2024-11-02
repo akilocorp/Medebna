@@ -17,6 +17,7 @@ import CartIcon from "@/components/carticon";
 import { getCarListing } from "@/stores/operator/ApiCallerOperatorCar";
 import { fetchCarOwnerProfileWithoutToken } from "@/stores/operator/carprofileapicaller";
 import { addToCartcar } from "@/stores/cart/carapicaller";
+import { motion } from "framer-motion";
 
 // Define interfaces
 interface CarCategory {
@@ -319,71 +320,92 @@ export default function ChooseCar() {
     <div
       className="bg-[#ffffff] min-h-screen text-[#000000]"
       {...swipeHandlers}
+
     >
-      {/* Custom AppBar with Rounded Corners and Padding */}
+      
       <Box
         sx={{
           display: "flex",
-          justifyContent: "center",
+          flexDirection: "column",
           padding: "16px 0",
           backgroundColor: "#f5f5f5",
         }}
       >
-        <Paper
-          elevation={3}
-          sx={{
-            borderRadius: "20px",
-            width: { xs: "90%", sm: "80%", md: "70%", lg: "60%" },
-            backgroundColor: "#fcd152",
-            padding: "8px 16px",
-            display: "flex",
-            alignItems: "center",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-            position: "relative",
-          }}
-          className="mx-4"
-        >
-          {/* Tabs */}
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            textColor="inherit"
-            indicatorColor="primary"
-            aria-label="customized tabs example"
-            variant="scrollable"
-            scrollButtons="auto"
-            sx={{
-              "& .MuiTabs-indicator": {
-                backgroundColor: "#ffffff",
-                height: "4px",
-                borderRadius: "2px",
-              },
-              "& .MuiTab-root": {
-                color: "#323232",
-                fontSize: "1.1rem",
-                fontWeight: "bold",
-                textTransform: "none",
-                letterSpacing: "0.5px",
-                padding: "12px 16px",
-                borderRadius: "10px",
-                transition: "background-color 0.3s, color 0.3s",
-              },
-              "& .Mui-selected": {
-                color: "#ffffff",
-                backgroundColor: "#fcc652",
-                boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.2)",
-              },
-            }}
+        {/* Header Section */}
+        <div style={{ position: 'relative', width: '100%' }}>
+    {/* Back Arrow */}
+    <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 10 }}>
+      <Link href="/cars" legacyBehavior>
+      <a className="inline-flex items-center bg-gradient-to-r from-[#fccc52] to-[#ff914d] text-[#323232] px-4 py-2 bg-opacity-90 rounded-lg hover:bg-[#fccc52] hover:text-[#ffffff] transition-colors duration-300">
+      <IoChevronBack className="mr-2 text-2xl" />
+    </a>
+      </Link>
+    </div>
+    {/* Page Title */}
+    <h1
+      className="text-3xl lg:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#fccc52] to-[#ff914d] drop-shadow-md mb-8"
+      style={{ textAlign: 'center', paddingTop: '64px' }}
+    >
+      Choose Your Car at {rentalName}
+    </h1>
+  </div>
+  {/* Cart Icon */}
+  <Box sx={{ position: "absolute", right: "16px" }}>
+            <CartIcon />
+          </Box>
+          <Paper
+  elevation={3}
+  sx={{
+    borderRadius: "20px",
+    width: { xs: "90%", sm: "80%", md: "70%", lg: "30%" },
+    backgroundColor: "#fcd152",
+    padding: "8px 16px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center", // Center the Tabs horizontally
+    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+    position: "relative",
+    margin: '0 auto',
+  }}
+  className="mx-4"
+>
+  <Tabs
+    value={value}
+    onChange={handleChange}
+    textColor="inherit"
+    indicatorColor="primary"
+    aria-label="customized tabs example"
+    variant="scrollable"
+    scrollButtons="auto"
+    sx={{
+      "& .MuiTabs-indicator": {
+        backgroundColor: "#ffffff",
+        height: "4px",
+        borderRadius: "2px",
+      },
+      "& .MuiTab-root": {
+        color: "#323232",
+        fontSize: "1.1rem",
+        fontWeight: "bold",
+        textTransform: "none",
+        letterSpacing: "0.5px",
+        padding: "12px 16px",
+        borderRadius: "10px",
+        transition: "background-color 0.3s, color 0.3s",
+      },
+      "& .Mui-selected": {
+        color: "#ffffff",
+        backgroundColor: "#fcc652",
+        boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.2)",
+      },
+    }}
           >
             <Tab label="Overview" {...a11yProps(0)} />
             <Tab label="Car Details" {...a11yProps(1)} />
             <Tab label="Rental Info" {...a11yProps(2)} />
           </Tabs>
 
-          {/* Cart Icon */}
-          <Box sx={{ position: "absolute", right: "16px" }}>
-            <CartIcon />
-          </Box>
+          
         </Paper>
       </Box>
 
@@ -392,21 +414,11 @@ export default function ChooseCar() {
         {/* Overview & Prices Tab */}
         <TabPanel value={value} index={0} dir={theme.direction}>
           {/* Back Button */}
-          <div className="p-4">
-            <Link href="/cars" legacyBehavior>
-              <a className="inline-flex items-center bg-gradient-to-r from-[#fccc52] to-[#ff914d] text-[#323232] mb-8 px-4 py-2 bg-opacity-90 rounded-lg hover:bg-[#fccc52] hover:text-[#ffffff] transition-colors duration-300">
-                <IoChevronBack className="mr-2 text-2xl" />
-              
-              </a>
-            </Link>
-          </div>
-
+          
           {/* Header Section */}
           <div className="w-full max-w-8xl p-4 flex flex-col items-center">
             <div className="flex flex-col items-center text-center py-4 px-10">
-              <h1 className="text-3xl lg:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#fccc52] to-[#ff914d] drop-shadow-md mb-8">
-                Choose Your Car at {rentalName}
-              </h1>
+              
               {/* Search Bar */}
               <div className="flex items-center mb-8 w-full max-w-md">
                 <input
@@ -504,7 +516,7 @@ export default function ChooseCar() {
                     {selectedCar.cars[0].carSpecificity.map((specificity) => (
                       <button
                         key={specificity._id}
-                        className={`flex flex-col items-center p-2 w-32 h-32 rounded-lg cursor-pointer border-4 transition-all duration-300 ${
+                        className={`flex flex-col items-center p-2 w-24 h-24 rounded-lg cursor-pointer border-4 transition-all duration-300 ${
                           carColorId === specificity._id
                             ? "border-[#fccc52] bg-gray-100 "
                             : "border-gray-300"
@@ -823,6 +835,51 @@ export default function ChooseCar() {
           </Box>
         </TabPanel>
       </div>
+       {/* Floating Car Icons */}
+       {Array.from({ length: 10 }).map((_, index) => (
+        <motion.div
+          key={`calendar-${index}`}
+          className="absolute text-6xl opacity-20"
+          style={{
+            color: "#ff914d", // Lighter color for calendar icons
+            top: `${Math.random() * 100}vh`,
+            left: `${Math.random() * 100}vw`,
+          }}
+          animate={{
+            y: ["0%", "10%", "0%"],
+            x: ["0%", "-10%", "10%", "0%"],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            repeatType: "mirror",
+          }}
+        >
+          <FaCar />
+        </motion.div>
+      ))}
+       {Array.from({ length: 10 }).map((_, index) => (
+        <motion.div
+          key={`calendar-${index}`}
+          className="absolute text-6xl opacity-20"
+          style={{
+            color: "#ff914d", // Lighter color for calendar icons
+            top: `${Math.random() * 100}vh`,
+            left: `${Math.random() * 100}vw`,
+          }}
+          animate={{
+            y: ["0%", "10%", "0%"],
+            x: ["0%", "-10%", "10%", "0%"],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            repeatType: "mirror",
+          }}
+        >
+          <FaCar />
+        </motion.div>
+      ))}
     </div>
   );
 }

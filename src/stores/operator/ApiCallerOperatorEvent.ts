@@ -28,7 +28,7 @@ const getUserIdFromToken = (): string | null => {
 // Function to add an event
 export const addEvent = async (formData: Event, token: string) => {
   try {
-    const response = await fetch("http://147.79.100.108:5000/event/add-event", {
+    const response = await fetch("https://api.medebna.com/event/add-event", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -59,7 +59,7 @@ export const getAllEvents = async () => {
   }
 
   try {
-    const response = await fetch(`http://147.79.100.108:5000/event/event/${operatorId}`, {
+    const response = await fetch(`https://api.medebna.com/event/event/${operatorId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -83,7 +83,7 @@ export const getAllEvents = async () => {
 
 export const updateEvent = async (event: Event, id: string, token: string) => {
   try {
-    const response = await fetch(`http://147.79.100.108:5000/event/update-event/${id}`, {
+    const response = await fetch(`https://api.medebna.com/event/update-event/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -109,7 +109,7 @@ export const updateEvent = async (event: Event, id: string, token: string) => {
 export const deleteEvent = async (id: string) => {
   const token = getToken();
   try {
-    const response = await fetch(`http://147.79.100.108:5000/event/delete-event/${id}`, {
+    const response = await fetch(`https://api.medebna.com/event/delete-event/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -132,7 +132,7 @@ export const deleteEvent = async (id: string) => {
 };
 export const getAllEvent = async (id: string) => {
   try {
-    const response = await fetch(`http://147.79.100.108:5000/event/event/${id}`, {
+    const response = await fetch(`https://api.medebna.com/event/event/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

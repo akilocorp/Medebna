@@ -31,7 +31,7 @@ export const addEventToCart = async (
   console.log('Event Data:', dataToSend);
 
   try {
-    const response = await fetch('http://147.79.100.108:5000/cart/add-cart', {
+    const response = await fetch('https://api.medebna.com/cart/add-cart', {
       method: 'POST',
       headers: {
         "Content-Type": "application/json",
@@ -64,7 +64,7 @@ export const addToCart = async (hotelId: string, productType: string, roomId: st
   console.log(dataToSend);
 
   try {
-    const response = await fetch('http://147.79.100.108:5000/cart/add-cart', {
+    const response = await fetch('https://api.medebna.com/cart/add-cart', {
       method: 'POST',
       headers: {
         "Content-Type": "application/json",
@@ -89,7 +89,7 @@ export const addToCart = async (hotelId: string, productType: string, roomId: st
 
 export const getCartCount = async (sessionId: string) => {
   try {
-    const response = await fetch(`http://147.79.100.108:5000/cart/get-all-items/${sessionId}`);
+    const response = await fetch(`https://api.medebna.com/cart/get-all-items/${sessionId}`);
     if (!response.ok) {
       throw new Error('Failed to fetch cart count');
     }
@@ -104,7 +104,7 @@ export const getCartCount = async (sessionId: string) => {
 export const getCartItems = async (sessionId: string) => {
   console.log('Getting Cart', sessionId);
   try {
-    const response = await fetch(`http://147.79.100.108:5000/cart/get-all-items/${sessionId}`, {
+    const response = await fetch(`https://api.medebna.com/cart/get-all-items/${sessionId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -153,7 +153,7 @@ export const deleteCartItem = async (
       eventTypeId,
     });
 
-    const response = await fetch(`http://147.79.100.108:5000/cart/delete-cart/${sessionId}/${productId}`, {
+    const response = await fetch(`https://api.medebna.com/cart/delete-cart/${sessionId}/${productId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -207,7 +207,7 @@ export const addToCartcar = async (
   console.log('Sending data to add to cart:', dataToSend);
 
   try {
-    const response = await fetch('http://147.79.100.108:5000/cart/add-cart', {
+    const response = await fetch('https://api.medebna.com/cart/add-cart', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

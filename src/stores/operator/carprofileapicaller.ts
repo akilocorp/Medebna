@@ -56,7 +56,7 @@ export const addCarOwnerProfile = async (profileData: CarOwnerProfileCreate) => 
   const token = getToken();
 
   try {
-    const response = await fetch("http://147.79.100.108:5000/car-owner/add-car-owner-profile", {
+    const response = await fetch("https://api.medebna.com/car-owner/add-car-owner-profile", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export const addCarOwnerProfile = async (profileData: CarOwnerProfileCreate) => 
 export const fetchCarOwnerProfile = async (id: string): Promise<CarOwnerProfile | null> => {
   const token = getToken();
   try {
-    const response = await fetch(`http://147.79.100.108:5000/car-owner/car-owner-detail/${id}`, {
+    const response = await fetch(`https://api.medebna.com/car-owner/car-owner-detail/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ export const fetchCarOwnerProfile = async (id: string): Promise<CarOwnerProfile 
 export const updateCarOwnerProfile = async (id: string, profileData: CarOwnerProfile): Promise<CarOwnerProfile> => {
   const token = getToken();
   try {
-    const response = await fetch(`http://147.79.100.108:5000/car-owner/update-car-owner-profile/${id}`, {
+    const response = await fetch(`https://api.medebna.com/car-owner/update-car-owner-profile/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ export const updateCarOwnerProfile = async (id: string, profileData: CarOwnerPro
 };
 export const fetchCarOwnerProfileWithoutToken = async (id: string): Promise<CarOwnerProfile | null> => {
   try {
-    const response = await fetch(`http://147.79.100.108:5000/car-owner/car-owner-detail/${id}`, {
+    const response = await fetch(`https://api.medebna.com/car-owner/car-owner-detail/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

@@ -35,7 +35,7 @@ export const addOperator = async (formData: RegisterFormData) => {
   console.log("Token being used:", token); // Debugging line to check token
 
   try {
-    const response = await fetch("http://147.79.100.108:5000/operator/add-operator", {
+    const response = await fetch("https://api.medebna.com/operator/add-operator", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export const addOperator = async (formData: RegisterFormData) => {
 
 export const getHotels = async (): Promise<Operators[]> => {
   try {
-    const response = await fetch("http://147.79.100.108:5000/operator/get-all-operators", {
+    const response = await fetch("https://api.medebna.com/operator/get-all-operators", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -95,7 +95,7 @@ export const getOperators = async (): Promise<Operator[]> => {
   const token = getToken();
 
   try {
-    const response = await fetch("http://147.79.100.108:5000/operator/get-all-operators", {
+    const response = await fetch("https://api.medebna.com/operator/get-all-operators", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -138,7 +138,7 @@ export const updateOperator = async (operator: Operator) => {
   }
 
   try {
-    const response = await fetch(`http://147.79.100.108:5000/operator/update-operator/${id}`, {
+    const response = await fetch(`https://api.medebna.com/operator/update-operator/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -173,7 +173,7 @@ export const updateOperator = async (operator: Operator) => {
 export const deleteOperator = async (id: string) => {
   const token = getToken();
   try {
-    const response = await fetch(`http://147.79.100.108:5000/operator/delete-operator/${id}`, {
+    const response = await fetch(`https://api.medebna.com/operator/delete-operator/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
