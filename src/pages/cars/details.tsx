@@ -16,7 +16,7 @@ import { useSwipeable } from "react-swipeable";
 import CartIcon from "@/components/carticon";
 import { getCarListing } from "@/stores/operator/ApiCallerOperatorCar";
 import { fetchCarOwnerProfileWithoutToken } from "@/stores/operator/carprofileapicaller";
-import { addToCartcar } from "@/stores/cart/carapicaller";
+import { addToCartcar, getSessionId } from "@/stores/cart/carapicaller";
 import { motion } from "framer-motion";
 
 // Define interfaces
@@ -212,7 +212,12 @@ export default function ChooseCar() {
     setCarTypeId(car._id);
     setIsModalOpen(true);
   };
-
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      getSessionId();
+    }
+  }, []);
+  
   // Handle adding car to cart
   const handleAddToCart = async () => {
     if (!selectedCar || !carTypeId || !carColorId) {
@@ -220,7 +225,7 @@ export default function ChooseCar() {
       return;
     }
 
-    const sessionId = localStorage.getItem("sessionId");
+    const sessionId = getSessionId();
     if (!sessionId) {
       alert("No session found. Please try again.");
       return;

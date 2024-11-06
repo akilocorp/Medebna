@@ -16,7 +16,7 @@ import { useSwipeable } from "react-swipeable";
 import CartIcon from "@/components/carticon";
 import { getListing } from "@/stores/operator/ApiCallerOperatorHotel";
 import { fetchHotelOwnerProfiles } from "@/stores/operator/hotelprofileapicaller";
-import { addToCart } from "@/stores/cart/carapicaller"; // Ensure the path is correct
+import { addToCart, getSessionId } from "@/stores/cart/carapicaller"; // Ensure the path is correct
 import { motion } from "framer-motion";
 
 // Define Interfaces
@@ -253,7 +253,11 @@ export default function ChooseRoom() {
     setSelectedHotelId(hotel.HotelId); // Use hotel.HotelId instead of hotel._id
     setIsModalOpen(true); // Open the modal for room selection
   };
-
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      getSessionId();
+    }
+  }, []);
   // Handle adding room to cart
   const handleAddToCart = async () => {
     console.log("Selected Room:", selectedRoom);
@@ -271,7 +275,7 @@ export default function ChooseRoom() {
       return;
     }
 
-    const sessionId = localStorage.getItem("sessionId");
+    const sessionId = getSessionId();
     if (!sessionId) {
       alert("No session found, please try again.");
       return;
@@ -601,36 +605,7 @@ export default function ChooseRoom() {
                       ))}
                     </select>
                   </div>
-
-                  {/* Number of Rooms Input */}
-                  <div className="mb-4 text-[#fccc52]">
-                    <label className="block text-sm drop-shadow-md mb-2">
-                      Number of Rooms
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={numRooms}
-                      onChange={(e) => setNumRooms(Number(e.target.value))}
-                      className="w-full px-4 py-2 rounded-full bg-gray-100 border-2 border-[#fccc52] shadow-lg text-[#323232] focus:outline-none focus:border-[#ff914d] text-sm hover:border-[#ff914d]"
-                      required
-                    />
-                  </div>
-
-                  {/* Number of Guests Input */}
-                  <div className="mb-4 text-[#fccc52]">
-                    <label className="block text-sm drop-shadow-md mb-2">
-                      Number of Guests
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={numGuests}
-                      onChange={(e) => setNumGuests(Number(e.target.value))}
-                      className="w-full px-4 py-2 rounded-full bg-gray-100 border-2 border-[#fccc52] shadow-lg text-[#323232] focus:outline-none focus:border-[#ff914d] text-sm hover:border-[#ff914d]"
-                      required
-                    />
-                  </div>
+                
 
                   {/* Action Buttons */}
                   <div className="flex justify-between">

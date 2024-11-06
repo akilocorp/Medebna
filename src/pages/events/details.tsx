@@ -29,7 +29,7 @@ import {
 import CartIcon from "@/components/carticon";
 import { getAllEvent } from "@/stores/operator/ApiCallerOperatorEvent";
 import { fetchEventOwnerProfile } from "@/stores/operator/eventprofileapicaller";
-import { addEventToCart } from "@/stores/cart/carapicaller";
+import { addEventToCart, getSessionId } from "@/stores/cart/carapicaller";
 import { useSwipeable } from "react-swipeable";
 import { motion } from "framer-motion";
 
@@ -171,7 +171,11 @@ export default function EventDetailsPage() {
     setSelectedEvent(event);
     setIsModalOpen(true);
   };
-
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      getSessionId();
+    }
+  }, []);
   // Handle adding event to cart
   const handleAddToCart = async () => {
     if (!selectedEvent) {
@@ -179,7 +183,7 @@ export default function EventDetailsPage() {
       return;
     }
 
-    const sessionId = localStorage.getItem("sessionId");
+    const sessionId = getSessionId();
     if (!sessionId) {
       alert("No session found. Please try again.");
       return;
