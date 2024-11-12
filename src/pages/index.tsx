@@ -68,7 +68,7 @@ export default function Home() {
     const fetchOperators = async () => {
       try {
         const operatorData = await getHotels();
-        
+
         setOperators(operatorData);
 
         // Fetch profiles for each operator
@@ -102,7 +102,6 @@ export default function Home() {
         }
         setProfiles(profileData);
       } catch (error) {
-       
       } finally {
         setLoading(false);
       }
@@ -119,7 +118,6 @@ export default function Home() {
     const filteredOperators = operators.filter(
       (operator) => operator.type === type
     );
-   
 
     return filteredOperators.map((operator, index) => {
       const profile = profiles[operator._id];
@@ -219,10 +217,10 @@ export default function Home() {
       <div className="absolute top-0 left-0 w-full h-full -z-10 overflow-hidden">
         {Array.from({ length: 20 }).map((_, index) => {
           const size = Math.floor(Math.random() * 60) + 30; // Reduce size for a cleaner look
-          const positionTop = Math.floor(Math.random() * 100); 
+          const positionTop = Math.floor(Math.random() * 100);
           const positionLeft = Math.floor(Math.random() * 100);
-          const duration = Math.random() * 10 + 5; 
-          const delay = Math.random() * 5; 
+          const duration = Math.random() * 10 + 5;
+          const delay = Math.random() * 5;
 
           const iconType =
             index % 3 === 0 ? "car" : index % 3 === 1 ? "event" : "hotel";
@@ -390,6 +388,34 @@ export default function Home() {
           </motion.div>
         </motion.div>
 
+        {/* Hotels Overview */}
+        <section id="hotels" className="max-w-6xl mx-auto px-4 py-6 rounded-lg">
+          <motion.div
+            className="flex items-center justify-between"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1.5 }}
+          >
+            <h2 className="text-4xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-[#fccc52] to-[#ff914d] drop-shadow-lg">
+              Hotels Overview
+            </h2>
+          </motion.div>
+          <motion.div
+            className="flex space-x-4 overflow-x-auto scrollbar-hide rounded-lg p-2"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: {
+                transition: {
+                  staggerChildren: 0.3,
+                },
+              },
+            }}
+          >
+            {renderCards("hotel")}
+          </motion.div>
+        </section>
         {/* Car Rentals Overview */}
         <section
           id="rentals"
@@ -419,35 +445,6 @@ export default function Home() {
             }}
           >
             {renderCards("car")}
-          </motion.div>
-        </section>
-
-        {/* Hotels Overview */}
-        <section id="hotels" className="max-w-6xl mx-auto px-4 py-6 rounded-lg">
-          <motion.div
-            className="flex items-center justify-between"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1.5 }}
-          >
-            <h2 className="text-4xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-[#fccc52] to-[#ff914d] drop-shadow-lg">
-              Hotels Overview
-            </h2>
-          </motion.div>
-          <motion.div
-            className="flex space-x-4 overflow-x-auto scrollbar-hide rounded-lg p-2"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: {},
-              visible: {
-                transition: {
-                  staggerChildren: 0.3,
-                },
-              },
-            }}
-          >
-            {renderCards("hotel")}
           </motion.div>
         </section>
 
