@@ -63,7 +63,7 @@ const CarOwnerProfilePage: React.FC = () => {
           toast.error("Profile not found.");
         }
       } catch (error) {
-        console.error("Error fetching profile:", error);
+     
         toast.error("Error fetching profile.");
       } finally {
         setLoading(false);
@@ -135,7 +135,7 @@ const CarOwnerProfilePage: React.FC = () => {
         // Exit editing mode
         setIsEditing(false);
       } catch (error) {
-        console.error("Error updating profile:", error);
+       
         toast.error("Error updating profile.");
       }
     }

@@ -28,7 +28,7 @@ export const addEventToCart = async (
     numberOfTickets, // Number of tickets selected
     sessionId, // Pass the session ID
   };
-  console.log('Event Data:', dataToSend);
+  
 
   try {
     const response = await fetch('https://api.medebna.com/cart/add-cart', {
@@ -48,7 +48,7 @@ export const addEventToCart = async (
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Add event to cart error:', error);
+  
     throw error;
   }
 };
@@ -61,7 +61,7 @@ export const addToCart = async (hotelId: string, productType: string, roomId: st
     roomId, // Pass the selected room's ID
     sessionId, // Pass the session ID
   };
-  console.log(dataToSend);
+ 
 
   try {
     const response = await fetch('https://api.medebna.com/cart/add-cart', {
@@ -81,7 +81,7 @@ export const addToCart = async (hotelId: string, productType: string, roomId: st
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Add to cart error:', error);
+    
     throw error;
   }
 };
@@ -96,13 +96,13 @@ export const getCartCount = async (sessionId: string) => {
     const data = await response.json();
     return data.length; // Assuming the response is an array of cart items
   } catch (error) {
-    console.error('Error fetching cart count:', error);
+    
     return 0; // Return 0 if there's an error
   }
 };
 
 export const getCartItems = async (sessionId: string) => {
-  console.log('Getting Cart', sessionId);
+
   try {
     const response = await fetch(`https://api.medebna.com/cart/get-all-items/${sessionId}`, {
       method: 'GET',
@@ -113,7 +113,7 @@ export const getCartItems = async (sessionId: string) => {
 
     if (!response.ok) {
       if (response.status === 404) {
-        console.error(`Cart items not found for sessionId: ${sessionId}`);
+       
         return []; // Return an empty array if no items are found
       }
       const errorMessage = await response.text();
@@ -123,7 +123,7 @@ export const getCartItems = async (sessionId: string) => {
     const data = await response.json();
     return data.items || []; // Ensure it returns an array
   } catch (error) {
-    console.error('Error fetching cart items:', error);
+    
     throw error;
   }
 };
@@ -144,14 +144,7 @@ export const deleteCartItem = async (
       eventTypeId,
     };
 
-    // Log the details before making the request
-    console.log('Delete Request:', {
-      sessionId,
-      productId,
-      roomId,
-      carTypeId,
-      eventTypeId,
-    });
+   
 
     const response = await fetch(`https://api.medebna.com/cart/delete-cart/${sessionId}/${productId}`, {
       method: 'DELETE',
@@ -162,18 +155,17 @@ export const deleteCartItem = async (
     });
 
     const responseText = await response.text();
-    console.log('Response Status:', response.status);
-    console.log('Response Body:', responseText);
+  
 
     if (!response.ok) {
-      console.error('Delete cart item response error:', responseText);
+   
       throw new Error(responseText);
     }
 
     const data = JSON.parse(responseText); // Parse the response if successful
     return data;
   } catch (error) {
-    console.error('Error deleting cart item:', error);
+   
     throw error;
   }
 };
@@ -204,7 +196,7 @@ export const addToCartcar = async (
     carColorId,
   };
 
-  console.log('Sending data to add to cart:', dataToSend);
+ 
 
   try {
     const response = await fetch('https://api.medebna.com/cart/add-cart', {
@@ -223,7 +215,7 @@ export const addToCartcar = async (
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error adding to cart:', error);
+    
     throw error;
   }
 };

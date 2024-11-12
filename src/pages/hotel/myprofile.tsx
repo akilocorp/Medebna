@@ -122,15 +122,15 @@ const ViewHotelOwnerProfile: React.FC = () => {
               toast.error('Please first add profile.');
             }
           } else {
-            console.error('No hotel owner ID found in token.');
+          
             toast.error('Invalid token.');
           }
         } else {
-          console.error('No token found in local storage.');
+          
           toast.error('You must be logged in to view this profile.');
         }
       } catch (error) {
-        console.error('Error fetching profile:', error);
+       
       } finally {
         setLoading(false);
       }
@@ -216,7 +216,7 @@ const ViewHotelOwnerProfile: React.FC = () => {
       toast.success('Profile updated successfully.');
       setIsEditing(false);
     } catch (error) {
-      console.error('Error updating profile:', error);
+      
       toast.error('Error updating profile.');
     }
   };

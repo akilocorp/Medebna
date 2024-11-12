@@ -279,7 +279,7 @@ const AddEventForm: React.FC<InjectedFormProps<FormValues>> = ({ handleSubmit })
         foodAndDrink: values.eventDetails.foodAndDrink,
       },
     };
-    console.log("Form Data:", formattedValues);
+    
     
     try {
       await addEvent(formattedValues, token);

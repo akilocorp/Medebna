@@ -223,7 +223,7 @@ const HotelProfileForm: React.FC<InjectedFormProps<FormValues>> = ({
   const router = useRouter();
 
   const onSubmit = async (values: FormValues) => {
-    console.log("Submitting values:", values);
+  
     try {
       const formattedValues: HotelProfileCreate = {
         address: values.address,
@@ -270,7 +270,7 @@ const HotelProfileForm: React.FC<InjectedFormProps<FormValues>> = ({
       
       const createdProfile = await addHotelOwnerProfile(formattedValues);
       
-      console.log("Created Profile Response:", createdProfile);
+      
       
       toast.success("Hotel profile added successfully");
   

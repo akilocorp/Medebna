@@ -21,7 +21,7 @@ const CartIcon = () => {
         setCartCount(0);
       }
     } catch (error) {
-      console.error('Failed to fetch cart count:', error);
+     
       setCartCount(0);
     }
   };
@@ -38,7 +38,7 @@ const CartIcon = () => {
 
   // Function to close the modal
   const closeModal = () => {
-    console.log('Closing modal'); // Debugging log
+   
     setIsModalOpen(false);
   };
 

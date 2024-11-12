@@ -25,12 +25,12 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, closeModal, refreshCart }
         const items = await getCartItems(sessionId);
         setCartItems(items);
       } else {
-        console.error('No sessionId found in localStorage');
+        
         showToast('Session expired. Please log in again.', 'error');
         setCartItems([]);
       }
     } catch (error) {
-      console.error('Failed to fetch cart items:', error);
+    
       showToast('Failed to fetch cart items.', 'error');
       setCartItems([]);
     } finally {
@@ -58,7 +58,7 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, closeModal, refreshCart }
   
     const sessionId = localStorage.getItem('sessionId');
     if (!sessionId) {
-      console.error('No sessionId found in localStorage');
+      
       showToast('Session expired. Please log in again.', 'error');
       return;
     }
@@ -77,7 +77,6 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, closeModal, refreshCart }
           idToUse = eventTypeId;
           break;
         default:
-          console.error('Unknown product type');
           return;
       }
   
@@ -90,7 +89,7 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, closeModal, refreshCart }
       // Notify CartIcon to refresh cart count
       refreshCart();
     } catch (error) {
-      console.error('Failed to delete cart item:', error);
+      
       showToast('Failed to delete item. Please try again.', 'error');
     }
   };

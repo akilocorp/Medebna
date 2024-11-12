@@ -14,10 +14,10 @@ const CartPage = () => {
           const items = await getCartItems(sessionId);
           setCartItems(items);
         } else {
-          console.error('No sessionId found in localStorage');
+        
         }
       } catch (error) {
-        console.error('Failed to fetch cart items:', error);
+       
       } finally {
         setLoading(false);
       }
@@ -33,7 +33,7 @@ const CartPage = () => {
 
     const sessionId = localStorage.getItem('sessionId');
     if (!sessionId) {
-      console.error('No sessionId found in localStorage');
+     
       return;
     }
 
@@ -45,9 +45,9 @@ const CartPage = () => {
         prevItems.filter((item) => !(item.productId === productId && item.roomId === roomId))
       );
 
-      console.log(`Deleted item with productId: ${productId} and roomId: ${roomId}`);
+     
     } catch (error) {
-      console.error('Failed to delete cart item:', error);
+    
     }
   };
 

@@ -92,8 +92,7 @@ const AddOperatorForm: React.FC<InjectedFormProps<FormValues>> = ({ handleSubmit
         email: values.email.toLowerCase(), // Convert email to lowercase
       };
   
-      // Log the formatted values being sent to the backend
-      console.log("Form data being sent to backend:", formattedValues);
+      
   
       await addOperator(formattedValues);
       toast.success('Operator added successfully');

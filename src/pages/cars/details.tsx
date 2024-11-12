@@ -154,17 +154,16 @@ export default function ChooseCar() {
     setLoading(true);
     try {
       const carTypes = await getCarListing(id);
-      console.log("carTypes:", carTypes);
-
+     
       if (carTypes && carTypes.length > 0) {
         setCarTypes(carTypes);
         setFilteredCars(carTypes); // Set filtered cars to display initially
       } else {
-        console.error("No car types found for this rental");
+       
         setFilteredCars([]);
       }
     } catch (error) {
-      console.error("Error fetching car listing data:", error);
+     
     } finally {
       setLoading(false);
     }
@@ -178,10 +177,10 @@ export default function ChooseCar() {
       if (profile) {
         setCarOwnerProfile(profile);
       } else {
-        console.error("No car owner profile found for this ID");
+        
       }
     } catch (error) {
-      console.error("Error fetching car profile data:", error);
+     
     } finally {
       setLoading(false);
     }
@@ -253,7 +252,7 @@ export default function ChooseCar() {
       alert("Car added to cart successfully!");
       setIsModalOpen(false);
     } catch (error) {
-      console.error("Error adding car to cart:", error);
+     
       alert("Failed to add car to cart. Please try again.");
     }
   };

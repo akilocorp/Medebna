@@ -197,9 +197,9 @@ export default function ChooseRoom() {
     try {
       const hotelData = await getListing(id);
       setHotels(hotelData); // Save hotel and room data
-      console.log("Fetched Hotel Data:", hotelData);
+     
     } catch (error) {
-      console.error("Error fetching hotel data", error);
+      
     } finally {
       setLoading(false);
     }
@@ -214,10 +214,10 @@ export default function ChooseRoom() {
         setFacilities(profile.data.hotelProfile.facilities);
         setHouseRules(profile.data.hotelProfile.houseRules);
       } else {
-        console.error("No hotel profile found for this ID");
+        
       }
     } catch (error) {
-      console.error("Error fetching hotel profile data:", error);
+     
     } finally {
       setLoading(false);
     }
@@ -246,8 +246,7 @@ export default function ChooseRoom() {
 
   // Handle room card click
   const handleRoomClick = (room: RoomType, hotel: Hotel) => {
-    console.log("Room clicked:", room);
-    console.log("Hotel clicked:", hotel);
+   
 
     setSelectedRoom(room); // Set the selected room
     setSelectedHotelId(hotel.HotelId); // Use hotel.HotelId instead of hotel._id
@@ -260,9 +259,7 @@ export default function ChooseRoom() {
   }, []);
   // Handle adding room to cart
   const handleAddToCart = async () => {
-    console.log("Selected Room:", selectedRoom);
-    console.log("Room Number:", roomNumber);
-    console.log("Selected Hotel ID:", selectedHotelId);
+   
 
     if (!selectedRoom || !roomNumber || !selectedHotelId) {
       alert("Please select a room, room number, and ensure the HotelId is available.");
@@ -288,7 +285,7 @@ export default function ChooseRoom() {
       sessionId: sessionId,
     };
 
-    console.log("Sending to cart:", dataToSend);
+    
 
     try {
       const response = await addToCart(selectedHotelId, "hotel", selectedRoomObject._id); // Correctly send hotel.HotelId
@@ -297,7 +294,7 @@ export default function ChooseRoom() {
         setIsModalOpen(false); // Close the modal after success
       }
     } catch (error) {
-      console.error("Error adding to cart", error);
+      
       alert("Failed to add room to cart. Please try again.");
     }
   };

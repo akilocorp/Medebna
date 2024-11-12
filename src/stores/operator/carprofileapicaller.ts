@@ -73,7 +73,7 @@ export const addCarOwnerProfile = async (profileData: CarOwnerProfileCreate) => 
 
     return await response.json();
   } catch (error) {
-    console.error("Error adding car owner profile:", error);
+   
     throw error;
   }
 };
@@ -91,7 +91,7 @@ export const fetchCarOwnerProfile = async (id: string): Promise<CarOwnerProfile 
     });
 
     if (response.status === 404) {
-      console.warn('No car owner profile found with the given ID.');
+      
       return null;
     }
 
@@ -103,7 +103,7 @@ export const fetchCarOwnerProfile = async (id: string): Promise<CarOwnerProfile 
     const data: ApiResponse = await response.json();
     return data.data.carOwnerProfile;
   } catch (error) {
-    console.error('Fetch car owner profile error:', error);
+   
     throw error;
   }
 };
@@ -129,7 +129,7 @@ export const updateCarOwnerProfile = async (id: string, profileData: CarOwnerPro
     const data = await response.json();
     return data.carOwnerProfile;
   } catch (error) {
-    console.error('Update car owner profile error:', error);
+    
     throw error;
   }
 };
@@ -144,7 +144,7 @@ export const fetchCarOwnerProfileWithoutToken = async (id: string): Promise<CarO
     });
 
     if (response.status === 404) {
-      console.warn('No car owner profile found with the given ID.');
+     
       return null;
     }
 
@@ -156,7 +156,7 @@ export const fetchCarOwnerProfileWithoutToken = async (id: string): Promise<CarO
     const data: ApiResponse = await response.json();
     return data.data.carOwnerProfile;
   } catch (error) {
-    console.error('Fetch car owner profile error:', error);
+   
     throw error;
   }
 };

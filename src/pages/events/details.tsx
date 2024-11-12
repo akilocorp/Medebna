@@ -132,10 +132,10 @@ export default function EventDetailsPage() {
         setEventsData(response);
         setFilteredEvents(response);
       } else {
-        console.error("Unexpected response structure:", response);
+       
       }
     } catch (error) {
-      console.error("Error fetching event details:", error);
+      
     }
   };
 
@@ -147,7 +147,7 @@ export default function EventDetailsPage() {
         setEventOwnerProfile(profile);
       }
     } catch (error) {
-      console.error("Error fetching event owner profile:", error);
+     
     }
   };
 
@@ -219,7 +219,7 @@ export default function EventDetailsPage() {
         setIsModalOpen(false);
       }
     } catch (error) {
-      console.error("Error adding to cart:", error);
+     
     }
   };
 

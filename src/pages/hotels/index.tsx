@@ -67,7 +67,7 @@ export default function ChooseHotel() {
         setHotels(hotels.filter(h => h !== null));
         setFilteredHotels(hotels.filter(h => h !== null));
       } catch (error) {
-        console.error('Error fetching hotels:', error);
+       
       } finally {
         setLoading(false);
       }

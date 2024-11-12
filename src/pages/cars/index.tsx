@@ -65,7 +65,7 @@ export default function ChooseCarRental() {
         setCarRentals(carRentals.filter(e => e !== null));
         setFilteredCarRentals(carRentals.filter(e => e !== null));
       } catch (error) {
-        console.error('Error fetching car rentals:', error);
+        
       } finally {
         setLoading(false);
       }

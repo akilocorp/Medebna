@@ -32,7 +32,7 @@ const getToken = () => {
 
 export const addOperator = async (formData: RegisterFormData) => {
   const token = getToken(); // Ensure this retrieves the correct token
-  console.log("Token being used:", token); // Debugging line to check token
+ 
 
   try {
     const response = await fetch("https://api.medebna.com/operator/add-operator", {
@@ -53,7 +53,7 @@ export const addOperator = async (formData: RegisterFormData) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Add operator error:", error);
+    
     throw error;
   }
 };
@@ -70,21 +70,21 @@ export const getHotels = async (): Promise<Operators[]> => {
 
     if (!response.ok) {
       const errorMessage = await response.text();
-      console.error("Error fetching operators:", errorMessage);
+      
       return [];
     }
 
     const data = await response.json();
-    console.log("API response:", data); // Check the entire API response
+   
 
     if (!data || !data.operators) {
-      console.error("No operators data found");
+      
       return [];
     }
 
     return data.operators; // Assuming data.operators is the correct path
   } catch (error) {
-    console.error("Error in getHotels:", error);
+   
     return [];
   }
 };
@@ -122,7 +122,7 @@ export const getOperators = async (): Promise<Operator[]> => {
 
     return operators;
   } catch (error) {
-    console.error("Get operators error:", error);
+   
     throw error;
   }
 };
@@ -161,7 +161,7 @@ export const updateOperator = async (operator: Operator) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Update operator error:", error);
+    
     throw error;
   }
 };
@@ -190,7 +190,7 @@ export const deleteOperator = async (id: string) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Delete operator error:", error);
+
     throw error;
   }
 };

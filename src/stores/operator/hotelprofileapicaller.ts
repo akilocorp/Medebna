@@ -80,7 +80,7 @@ interface Facilities {
       const data: HotelProfile = await response.json();
       return data;  // Return the profile data including the _id
     } catch (error) {
-      console.error('Add hotel profile error:', error);
+      
       throw error;
     }
   };
@@ -96,7 +96,7 @@ interface Facilities {
   export const fetchHotelOwnerProfile = async (id: string): Promise<ApiResponse | null> => {
     const token = getToken();
     try {
-      console.log("Fetching profile with ID:", id); // Log the ID being used
+      
     
       const response = await fetch(`https://api.medebna.com/hotel-owner/hotel-owner-detail/${id}`, {
         method: 'GET',
@@ -108,28 +108,28 @@ interface Facilities {
       });
     
       if (response.status === 404) {
-        console.warn('No hotel owner profile found with the given ID.');
+       
         return null; // or handle as appropriate
       }
     
       if (!response.ok) {
         const errorMessage = await response.text();
-        console.error("Error fetching profile:", errorMessage);
+       
         throw new Error(errorMessage);
       }
     
       const data: ApiResponse = await response.json();
-      console.log("Fetched Profile Data:", data); // Log the data received
+    
       return data;
     } catch (error) {
-      console.error('Fetch hotel profile error:', error);
+     
       throw error;
     }
   };
   export const fetchHotelOwnerProfiles = async (id: string): Promise<ApiResponse | null> => {
     
     try {
-      console.log("Fetching profile with ID:", id); // Log the ID being used
+     
     
       const response = await fetch(`https://api.medebna.com/hotel-owner/hotel-owner-detail/${id}`, {
         method: 'GET',
@@ -141,21 +141,21 @@ interface Facilities {
       });
     
       if (response.status === 404) {
-        console.warn('No hotel owner profile found with the given ID.');
+       
         return null; // or handle as appropriate
       }
     
       if (!response.ok) {
         const errorMessage = await response.text();
-        console.error("Error fetching profile:", errorMessage);
+       
         throw new Error(errorMessage);
       }
     
       const data: ApiResponse = await response.json();
-      console.log("Fetched Profile Data:", data); // Log the data received
+      
       return data;
     } catch (error) {
-      console.error('Fetch hotel profile error:', error);
+     
       throw error;
     }
   };
@@ -189,7 +189,7 @@ interface Facilities {
       // Return the hotelProfile directly
       return data.hotelProfile; 
     } catch (error) {
-      console.error('Update hotel profile error:', error);
+     
       throw error;
     }
   };

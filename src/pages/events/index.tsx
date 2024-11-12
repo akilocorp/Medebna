@@ -53,7 +53,7 @@ export default function ChooseEventCompany() {
         setEventCompanies(eventCompanies);
         setFilteredEventCompanies(eventCompanies);
       } catch (error) {
-        console.error('Error fetching event companies:', error);
+      
       } finally {
         setLoading(false);
       }

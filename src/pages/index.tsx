@@ -68,7 +68,7 @@ export default function Home() {
     const fetchOperators = async () => {
       try {
         const operatorData = await getHotels();
-        console.log("Fetched Operators:", operatorData);
+        
         setOperators(operatorData);
 
         // Fetch profiles for each operator
@@ -102,7 +102,7 @@ export default function Home() {
         }
         setProfiles(profileData);
       } catch (error) {
-        console.error("Error fetching operators:", error);
+       
       } finally {
         setLoading(false);
       }
@@ -119,7 +119,7 @@ export default function Home() {
     const filteredOperators = operators.filter(
       (operator) => operator.type === type
     );
-    console.log(`Rendering ${type} cards:`, filteredOperators);
+   
 
     return filteredOperators.map((operator, index) => {
       const profile = profiles[operator._id];

@@ -168,14 +168,14 @@ const AddHotelPage: React.FC = () => {
         })),
       };
 
-      console.log("Formatted Values: ", formattedValues);
+      
 
       const response = await addHotel(formattedValues);
-      console.log("API response:", response);
+     
       toast.success("Hotel added successfully");
       router.push("/hotel/View-Listings");
     } catch (error) {
-      console.error("Add hotel error:", error);
+     
       toast.error("Error adding hotel");
     }
   };

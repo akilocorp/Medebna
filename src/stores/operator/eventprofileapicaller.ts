@@ -74,13 +74,14 @@ export const addEventOwnerProfile = async (profileData: EventOwnerProfileCreate)
 
     return await response.json();
   } catch (error) {
-    console.error("Error adding event owner profile:", error);
+ 
     throw error;
   }
 };
 
 export const fetchEventOwnerProfile = async (id: string): Promise<EventOwnerProfile | null> => {
   const token = getToken();
+  
   try {
     const response = await fetch(`https://api.medebna.com/event-owner/event-owner-detail/${id}`, {
       method: 'GET',
@@ -92,7 +93,7 @@ export const fetchEventOwnerProfile = async (id: string): Promise<EventOwnerProf
     });
 
     if (response.status === 404) {
-      console.warn('No event owner profile found with the given ID.');
+     
       return null;
     }
 
@@ -104,7 +105,7 @@ export const fetchEventOwnerProfile = async (id: string): Promise<EventOwnerProf
     const data: ApiResponse = await response.json();
     return data.data.eventProfile;  // Update to correctly access the profile
   } catch (error) {
-    console.error('Fetch event profile error:', error);
+   
     throw error;
   }
 };
@@ -120,7 +121,7 @@ export const fetchEventOwnerProfiles = async (id: string) => {
     const data = await response.json();
     return data;  // Ensure you're returning the full response object
   } catch (error) {
-    console.error('Error fetching event owner profile:', error);
+    
     throw error;
   }
 };
@@ -147,7 +148,7 @@ export const updateEventOwnerProfile = async (id: string, profileData: EventOwne
     const data = await response.json();
     return data.eventProfile;  // Update to correctly access the profile
   } catch (error) {
-    console.error('Update event profile error:', error);
+  
     throw error;
   }
 };

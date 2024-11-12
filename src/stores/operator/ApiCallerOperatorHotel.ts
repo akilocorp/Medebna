@@ -39,7 +39,7 @@ const getUserIdFromToken = (): string | null => {
     const decoded: any = jwt.decode(token);
     return decoded?.id || null;
   } catch (error) {
-    console.error("Error decoding token:", error);
+    
     return null;
   }
 };
@@ -60,15 +60,15 @@ export const addHotel = async (formData: Hotel) => {
 
     if (!response.ok) {
       const errorMessage = await response.text();
-      console.error("Response not OK:", response.status, errorMessage);
+    
       throw new Error(errorMessage);
     }
 
     const data = await response.json();
-    console.log("Response Data:", data);
+    
     return data;
   } catch (error) {
-    console.error("Add hotel error:", (error as Error).message);
+   
     throw error;
   }
 };
@@ -96,10 +96,10 @@ export const getListings = async () => {
     }
 
     const data = await response.json();
-    console.log("Response Data:", data);
+   
     return data.data.hotel; // Adjust based on the structure returned by the backend
   } catch (error) {
-    console.error("Get hotel details error:", error);
+   
     throw error;
   }
 };
@@ -119,7 +119,7 @@ export const getListing = async (id: string) => {
     }
 
     const data = await response.json();
-    console.log("Full API Response:", data);
+   
 
     const hotels = data.data.hotel; // Get the array of hotels
 
@@ -131,7 +131,7 @@ export const getListing = async (id: string) => {
 
     return hotelDetails; // Return an array of objects with roomTypes and HotelId
   } catch (error) {
-    console.error("Get hotel details error:", error);
+   
     throw error;
   }
 };
@@ -164,7 +164,7 @@ export const updateListing = async (listing: Listing) => {
     const data = await response.json();
     return data; // Return updated hotel data
   } catch (error) {
-    console.error("Update listing error:", error);
+   
     throw error;
   }
 };
@@ -193,7 +193,7 @@ export const deleteListing = async (id: string) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Delete hotel error:", error);
+    
     throw error;
   }
 };

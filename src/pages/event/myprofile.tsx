@@ -62,7 +62,7 @@ const ViewEventOwnerProfile: React.FC = () => {
           toast.error('Profile not found.');
         }
       } catch (error) {
-        console.error('Error fetching profile:', error);
+        
         toast.error('Error fetching profile.');
       } finally {
         setLoading(false);
@@ -125,7 +125,7 @@ const ViewEventOwnerProfile: React.FC = () => {
         toast.success('Profile updated successfully.');
         setIsEditing(false);
       } catch (error) {
-        console.error('Error updating profile:', error);
+       
         toast.error('Error updating profile.');
       }
     }

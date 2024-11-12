@@ -20,7 +20,7 @@ const getUserIdFromToken = (): string | null => {
     const decoded: any = jwt.decode(token);
     return decoded?.id || null;
   } catch (error) {
-    console.error("Error decoding token:", error);
+   
     return null;
   }
 };
@@ -46,7 +46,7 @@ export const addEvent = async (formData: Event, token: string) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Add event error:", error);
+    
     throw error;
   }
 };
@@ -76,7 +76,7 @@ export const getAllEvents = async () => {
     const data = await response.json();
     return data.data.event; // Adjust this line to access the 'event' array
   } catch (error) {
-    console.error("Get events error:", error);
+    
     throw error;
   }
 };
@@ -101,7 +101,7 @@ export const updateEvent = async (event: Event, id: string, token: string) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Update event error:", error);
+   
     throw error;
   }
 };
@@ -126,7 +126,7 @@ export const deleteEvent = async (id: string) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Delete event error:", error);
+  
     throw error;
   }
 };
@@ -146,10 +146,10 @@ export const getAllEvent = async (id: string) => {
     }
 
     const data = await response.json();
-    console.log("Full API Response:", data);
+   
     return data.data.event; // Adjust this line to access the 'event' array
   } catch (error) {
-    console.error("Get events error:", error);
+   
     throw error;
   }
 };

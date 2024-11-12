@@ -28,9 +28,9 @@ const Header = () => {
     
     try {
       const formData: SignInFormData = { email, password };
-      console.log("Form Data being sent: ", formData);  // Log form data
+     
       const response = await signIn(formData);
-      console.log("Response from backend: ", response);  // Log response data
+     
   
       const user = response.user;
       const token = response.token;
@@ -52,7 +52,7 @@ const Header = () => {
         router.push('/');
       }
     } catch (error) {
-      console.error('Sign in error:', error);  // Log the error
+     
       toast.error('Error signing in');
     }
   };

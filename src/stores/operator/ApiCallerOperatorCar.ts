@@ -18,7 +18,7 @@ const getUserIdFromToken = (): string | null => {
     const decoded: any = jwt.decode(token);
     return decoded?.id || null;
   } catch (error) {
-    console.error("Error decoding token:", error);
+    
     return null;
   }
 };
@@ -43,7 +43,7 @@ export const addCarRental = async (formData: CarRental, token: string) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Add car rental error:", error);
+   
     throw error;
   }
 };
@@ -71,7 +71,7 @@ export const getCarListings = async () => {
     const data = await response.json();
     return data.data.car; // This will return the array of car listings
   } catch (error) {
-    console.error("Get car details error:", error);
+    
     throw error;
   }
 };
@@ -91,7 +91,7 @@ export const getCarListing = async (id: string) => {
     }
 
     const data = await response.json();
-    console.log("Full API Response:", data);
+    
 
     // Check if the data contains cars
     if (data && data.data && Array.isArray(data.data.car)) {
@@ -124,14 +124,14 @@ export const getCarListing = async (id: string) => {
       if (allCarTypes.length > 0) {
         return allCarTypes;
       } else {
-        console.error("No car types found for this listing");
+        
         return [];
       }
     } else {
       throw new Error("Invalid API response structure");
     }
   } catch (error) {
-    console.error("Get car listing details error:", error);
+
     throw error;
   }
 };
@@ -157,7 +157,7 @@ export const updateCarListing = async (carRental: CarRental, id: string, token: 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Update car rental error:", error);
+   
     throw error;
   }
 };
@@ -182,7 +182,7 @@ export const deleteCarListing = async (id: string) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Delete car error:", error);
+    
     throw error;
   }
 };
