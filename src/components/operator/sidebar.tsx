@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FiLogOut, FiUser, FiPlusSquare, FiEdit } from "react-icons/fi";
-
+import { CiBank } from "react-icons/ci";
 const OperatorSidebar = () => {
   const [userType, setUserType] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
@@ -38,7 +38,7 @@ const OperatorSidebar = () => {
   const profile = `/${userType}/profile`;
   const addListingPath = `/${userType}/Add-Listing-Form`;
   const viewListingsPath = `/${userType}/View-Listings`;
-
+  const addaccount = `/${userType}/Addaccount`;
   return (
     <div className="w-64 h-screen bg-[#ffffff] text-black flex flex-col rounded-r-2xl justify-between shadow-lg">
       <div>
@@ -47,7 +47,7 @@ const OperatorSidebar = () => {
           <Link href="/">
             <div className="flex items-center p-4 bg-gradient-to-r from-[#ff914d] to-[#fccc52] rounded-3xl shadow-lg">
               <div className="p-2 bg-white rounded-full">
-                <FiUser className="text-[#ff914d] w-8 h-8" />
+                <FiUser className="text-[#ff914d] w-8 h-8 drop-shadow-md" />
               </div>
               <div className="ml-4">
                 <p
@@ -76,14 +76,21 @@ const OperatorSidebar = () => {
           <p className="text-black p-4 font-semibold drop-shadow-md">
             Operator
           </p>
-          <li className="mb-2">
+          <li className="mb-1">
             <Link href={myprofile} legacyBehavior>
               <a className="hover:bg-[#ff914d] hover:text-[#ff914d] hover:bg-opacity-20 p-3 flex drop-shadow-md items-center text-black block rounded-lg transition-colors duration-300">
                 <FiUser className="mr-2 flex drop-shadow-md" /> My Profile
               </a>
             </Link>
           </li>
-          <li className="mb-2">
+          <li>
+          <Link href={addaccount} legacyBehavior>
+              <a className="hover:bg-[#ff914d] hover:text-[#ff914d] hover:bg-opacity-20 p-3 flex drop-shadow-md items-center text-black block rounded-lg transition-colors duration-300">
+              <CiBank className="mr-2 flex font-bold text-black text-xl drop-shadow-md" /> Add Bank Account
+              </a>
+            </Link>
+          </li>
+          <li className="mb-1">
             <Link href={addListingPath} legacyBehavior>
               <a className="hover:bg-[#ff914d] hover:text-[#ff914d] hover:bg-opacity-20 p-3 flex drop-shadow-md items-center text-black block rounded-lg transition-colors duration-300">
                 <FiPlusSquare className="mr-2 flex drop-shadow-md" /> Add

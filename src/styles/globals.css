@@ -13,3 +13,7 @@
   scrollbar-width: none;  /* Firefox */
 }
 
+body {
+  overflow-x: hidden;
+  background-color: #ffffff; /* Ensure no black color shows on the sides */
+}

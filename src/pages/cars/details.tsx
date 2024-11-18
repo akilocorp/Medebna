@@ -539,20 +539,7 @@ export default function ChooseCar() {
                     ))}
                   </div>
 
-                  {/* Ticket Selection */}
-                  <div className="mt-6">
-                    <label className="text-lg font-bold text-[#fccc52] mb-4 block">
-                      Number of Cars
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={numCars}
-                      onChange={(e) => setNumCars(Number(e.target.value))}
-                      className="w-full px-4 py-2 rounded-full bg-gray-100 border-2 border-[#fccc52] shadow-lg text-[#323232] focus:outline-none focus:border-[#ff914d] text-sm hover:border-[#ff914d]"
-                      required
-                    />
-                  </div>
+                
 
                   {/* Action Buttons */}
                   <div className="flex justify-between mt-4">

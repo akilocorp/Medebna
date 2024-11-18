@@ -628,9 +628,9 @@ export default function ChooseRoom() {
         {/* Facilities Tab */}
         <TabPanel value={value} index={1} dir={theme.direction}>
           {facilities && (
-            <div className="bg-[#ffffff] p-6 rounded-lg">
+            <div className="bg-[#ffffff] p-2 rounded-lg">
               <Typography
-                variant="h4"
+                variant="h6"
                 gutterBottom
                 style={{
                   color: "#ff914d",
@@ -641,9 +641,9 @@ export default function ChooseRoom() {
               >
                 Hotel Facilities
               </Typography>
-              <div className="mt-6">
+              <div className="mt-2">
                 <Box
-                  mb={8}
+                  mb={2}
                   display="flex"
                   justifyContent="center"
                   flexWrap="wrap"
@@ -683,7 +683,7 @@ export default function ChooseRoom() {
                               selectedCategory === category
                                 ? "0px 4px 15px rgba(0, 0, 0, 0.1)"
                                 : "none",
-                            padding: "16px 20px",
+                            padding: "14px 16px",
                             "&:hover": {
                               backgroundColor: "#fccc52",
                               color: "#6a6a6a",
