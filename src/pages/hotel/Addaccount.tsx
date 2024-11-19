@@ -82,7 +82,7 @@ const AddBankAccountForm: React.FC<InjectedFormProps<FormValues>> = ({
       console.log(formData);
       await addAccount(formData);
       toast.success('Bank account added successfully');
-      router.push('/operator/dashboard');
+     
     } catch (error) {
       console.error('Error adding bank account:', error);
       toast.error('Error adding bank account. Please try again.');
