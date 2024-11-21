@@ -60,3 +60,25 @@ export const addAccount = async (formData: any) => {
     throw error;
   }
 };
+export const fetchAccountData = async (userId: string) => {
+  const token = getToken();
+  try {
+    const response = await fetch(`https://api.medebna.com/account/fetchAccount/${userId}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    return data.data.account[0]; // Assuming you need the first account
+  } catch (error) {
+    throw error;
+  }
+};

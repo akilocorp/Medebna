@@ -7,7 +7,7 @@ import { FaStar, FaStarHalfAlt, FaRegStar, FaEdit } from 'react-icons/fa';
 import { RiUploadCloudFill } from 'react-icons/ri';
 import { CldUploadWidget } from 'next-cloudinary';
 import jwt from 'jsonwebtoken';
-
+import { fetchAccountData } from '@/stores/operator/ApiCaller';
 interface EventRules {
   checkIn: string;
   checkOut: string;
@@ -36,6 +36,9 @@ const ViewEventOwnerProfile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
   const [userName, setUserName] = useState<string | null>(null);
+  const [accountData, setAccountData] = useState<any | null>(null);
+  const [accountLoading, setAccountLoading] = useState<boolean>(true);
+  const [accountError, setAccountError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -58,6 +61,14 @@ const ViewEventOwnerProfile: React.FC = () => {
         const fetchedProfile = await fetchEventOwnerProfile(eventOwnerId);
         if (fetchedProfile) {
           setProfile(fetchedProfile);
+          try {
+            const account = await fetchAccountData(eventOwnerId);
+            setAccountData(account);
+          } catch (error: any) {
+            setAccountError(error.message || 'Failed to fetch account data');
+          } finally {
+            setAccountLoading(false);
+          }
         } else {
           toast.error('Profile not found.');
         }
@@ -161,6 +172,19 @@ const ViewEventOwnerProfile: React.FC = () => {
     <OperatorLayout>
       {profile ? (
         <div className="relative max-w-4xl mx-auto max-h-[45rem] overflow-y-scroll p-8 bg-[#ffffff] shadow-lg rounded-lg">
+             {accountLoading ? (
+        <p>Loading account data...</p>
+      ) : accountError ? (
+        <p>Error: {accountError}</p>
+      ) : accountData ? (
+        <div className="mb-4">
+          <h3 className="text-xl font-semibold text-[#ff914d] mb-3">Account Information</h3>
+          <p className="text-black">Account Name: {accountData.accountName}</p>
+          <p className="text-black">Account Number: {accountData.accountNumber}</p>
+        </div>
+      ) : (
+        <p>No account data available.</p>
+      )}
           <button
             onClick={handleEditClick}
             className="absolute top-4 right-4 text-black hover:text-[#ff914d]"
