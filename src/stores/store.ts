@@ -11,6 +11,9 @@ import eventcartReducer from "@/stores/cart/eventcartslicereducer"
 import hotelOwnerProfileReducer from '@/stores/operator/hotelprofileslicereducer'
 import carOwnerProfileReducer from '@/stores/operator/carprofileslicereducer'
 import eventOwnerProfileReducer from '@/stores/operator/eventprofileslicereducer'; 
+import bookingReducer from '@/stores/book/bookingSlice'
+
+
 
 const rootReducer = combineReducers({
   form: formReducer,
@@ -24,6 +27,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   events: eventReducer,
   cars: carReducer,  
+  booking: bookingReducer,
   hotels: hotelReducer, 
 });
 

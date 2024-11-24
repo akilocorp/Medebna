@@ -275,6 +275,7 @@ export default function ChooseRoom() {
     const sessionId = getSessionId();
     if (!sessionId) {
       alert("No session found, please try again.");
+      window.location.reload();
       return;
     }
 
@@ -291,7 +292,8 @@ export default function ChooseRoom() {
       const response = await addToCart(selectedHotelId, "hotel", selectedRoomObject._id); // Correctly send hotel.HotelId
       if (response) {
         alert("Room added to cart successfully.");
-        setIsModalOpen(false); // Close the modal after success
+        setIsModalOpen(false); 
+        window.location.reload();
       }
     } catch (error) {
       

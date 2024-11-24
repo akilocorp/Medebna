@@ -1,10 +1,9 @@
-// components/CartModal.tsx
-
 import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { FaTrashAlt } from 'react-icons/fa';
 import { getCartItems, deleteCartItem } from '@/stores/cart/carapicaller';
 import { showToast } from '@/components/popup';
+import BookingModal from './BookingModal';
 
 interface CartModalProps {
   isOpen: boolean;
@@ -25,12 +24,11 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, closeModal, refreshCart }
         const items = await getCartItems(sessionId);
         setCartItems(items);
       } else {
-        
         showToast('Session expired. Please log in again.', 'error');
         setCartItems([]);
+        window.location.reload(); // Reload the page
       }
     } catch (error) {
-    
       showToast('Failed to fetch cart items.', 'error');
       setCartItems([]);
     } finally {
@@ -55,14 +53,14 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, closeModal, refreshCart }
   ) => {
     const confirmed = window.confirm('Are you sure you want to delete this item?');
     if (!confirmed) return;
-  
+
     const sessionId = localStorage.getItem('sessionId');
     if (!sessionId) {
-      
       showToast('Session expired. Please log in again.', 'error');
+      window.location.reload(); // Reload the page
       return;
     }
-  
+
     try {
       // Determine which ID to pass based on product type
       let idToUse = '';
@@ -79,7 +77,7 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, closeModal, refreshCart }
         default:
           return;
       }
-  
+
       await deleteCartItem(sessionId, productId, roomId, carTypeId, '', eventTypeId);
       showToast('Item deleted successfully', 'success');
       
@@ -89,71 +87,7 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, closeModal, refreshCart }
       // Notify CartIcon to refresh cart count
       refreshCart();
     } catch (error) {
-      
       showToast('Failed to delete item. Please try again.', 'error');
-    }
-  };
-  
-  
-
-  // Format expiration time
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
-  };
-
-  // Render product details based on product type
-  const renderProductDetails = (item: any) => {
-    switch (item.productType) {
-      case 'event':
-        const eventDetails = item.productDetails.events;
-        const eventType = item.productDetails.eventPrices.find(
-          (price: any) => price._id === item.eventTypeId
-        );
-        const totalEventPrice = eventType?.price * item.numberOfTickets;
-
-        return (
-          <>
-            <p className="text-lg font-bold text-gray-600">Event: {eventDetails.description}</p>
-            <p className="text-gray-600">Date: {new Date(eventDetails.date).toLocaleDateString()} {eventDetails.startTime} - {eventDetails.endTime}</p>
-            <p className="text-gray-600">Location: {eventDetails.location}</p>
-            <p className="text-gray-600">Ticket Type: {eventType?.type}</p>
-            <p className="text-gray-600">Number of Tickets: {item.numberOfTickets}</p>
-            <p className="text-gray-600">Price per Ticket: ${eventType?.price}</p>
-            <p className="text-gray-800 font-bold">Total Price: ${totalEventPrice}</p>
-          </>
-        );
-      case 'car':
-        const carDetails = item.productDetails.cars[0];
-        const carSpecificity = carDetails.carSpecificity.find(
-          (specificity: any) => specificity._id === item.carSpecificityId
-        );
-        const totalCarPrice = carDetails.price * 1; // Adjust if multiple cars can be reserved
-
-        return (
-          <>
-            <p className="text-lg font-bold text-gray-600">Car: {carDetails.type}</p>
-            <p className="text-gray-600">Color: {carSpecificity?.color}</p>
-            <p className="text-gray-600">Price per Car: ${carDetails.price}</p>
-            <p className="text-gray-800 font-bold">Total Price: ${totalCarPrice}</p>
-          </>
-        );
-      case 'hotel':
-        const roomType = item.productDetails.roomTypes.find((type: any) =>
-          type.rooms.some((room: any) => room._id === item.roomId)
-        );
-        const room = roomType?.rooms.find((room: any) => room._id === item.roomId);
-        return (
-          <>
-            <p className="text-lg font-bold text-gray-600">Hotel: {item.hotelOwner}</p>
-            <p className="text-gray-600">Room Type: {roomType?.type}</p>
-            <p className="text-gray-600">Room Number: {room?.roomNumber}</p>
-            <p className="text-gray-600">Price: ${roomType?.price}</p>
-          </>
-        );
-      default:
-        return null;
     }
   };
 
@@ -204,11 +138,10 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, closeModal, refreshCart }
                 <ul className="space-y-4 max-h-80 overflow-y-auto">
                   {cartItems.map((item, index) => (
                     <CartItem
-                    key={index}
-                    item={item}
-                    onDelete={() => handleDelete(item.productId, item.productType, item.roomId, item.carTypeId, item.eventTypeId)}
-                  />
-                  
+                      key={index}
+                      item={item}
+                      onDelete={() => handleDelete(item.productId, item.productType, item.roomId, item.carTypeId, item.eventTypeId)}
+                    />
                   ))}
                 </ul>
               )}
@@ -240,6 +173,10 @@ const CartItem: React.FC<CartItemProps> = ({ item, onDelete }) => {
   const expirationTime = new Date(item.expiresAt).getTime();
   const currentTime = Date.now();
   const initialTimeLeft = Math.floor((expirationTime - currentTime) / 1000);
+  const [isBookingModalOpen, setBookingModalOpen] = useState(false);
+
+  const handleBookClick = () => setBookingModalOpen(true);
+  const closeBookingModal = () => setBookingModalOpen(false);
 
   const [timeLeft, setTimeLeft] = useState(initialTimeLeft > 0 ? initialTimeLeft : 0);
 
@@ -330,9 +267,31 @@ const CartItem: React.FC<CartItemProps> = ({ item, onDelete }) => {
           </p>
         )}
       </div>
-      <button onClick={onDelete} className="text-red-500 hover:text-red-700">
-        <FaTrashAlt size={20} />
-      </button>
+      <div className="flex gap-4">
+        <button onClick={onDelete} className="text-red-500 hover:text-red-700" disabled={timeLeft <= 0}>
+          <FaTrashAlt size={20} />
+        </button>
+        <button
+          onClick={handleBookClick}
+          className={`py-2 px-2 rounded-2xl font-semibold transition-colors ${
+            timeLeft > 0
+              ? 'bg-[#ff914d] text-white hover:bg-[#fccc52]'
+              : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+          }`}
+          disabled={timeLeft <= 0}
+        >
+          Book
+        </button>
+      </div>
+      {isBookingModalOpen && (
+        <BookingModal
+          isOpen={isBookingModalOpen}
+          closeModal={closeBookingModal}
+          productId={item.productId}
+          productType={item.productType}
+          sessionId={localStorage.getItem('sessionId')}
+        />
+      )}
     </li>
   );
 };

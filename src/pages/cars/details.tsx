@@ -227,6 +227,7 @@ export default function ChooseCar() {
     const sessionId = getSessionId();
     if (!sessionId) {
       alert("No session found. Please try again.");
+      window.location.reload();
       return;
     }
 
@@ -251,6 +252,7 @@ export default function ChooseCar() {
       );
       alert("Car added to cart successfully!");
       setIsModalOpen(false);
+      window.location.reload();
     } catch (error) {
      
       alert("Failed to add car to cart. Please try again.");

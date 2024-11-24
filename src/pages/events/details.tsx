@@ -186,6 +186,7 @@ export default function EventDetailsPage() {
     const sessionId = getSessionId();
     if (!sessionId) {
       alert("No session found. Please try again.");
+      window.location.reload();
       return;
     }
 
@@ -217,6 +218,7 @@ export default function EventDetailsPage() {
       if (response) {
         alert("Tickets added to cart successfully!");
         setIsModalOpen(false);
+        window.location.reload();
       }
     } catch (error) {
      
